@@ -42,6 +42,5 @@ public class FideBlazorApplication : BlazorApplication
             }
             throw new InvalidOperationException(message);
         }
-#endif
     }
 }
