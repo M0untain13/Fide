@@ -1,15 +1,14 @@
-﻿using System.ComponentModel;
+﻿using DevExpress.ExpressApp.ConditionalAppearance;
+using DevExpress.ExpressApp.Security;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.CompilerServices;
-using DevExpress.ExpressApp;
-using DevExpress.ExpressApp.ConditionalAppearance;
-using DevExpress.ExpressApp.Security;
 
 namespace Fide.Module.BusinessObjects;
 
 [Table("PermissionPolicyUserLoginInfo")]
-public class ApplicationUserLoginInfo : ISecurityUserLoginInfo {
+public class ApplicationUserLoginInfo : ISecurityUserLoginInfo
+{
 
     public ApplicationUserLoginInfo() { }
 

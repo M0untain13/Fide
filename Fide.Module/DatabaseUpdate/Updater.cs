@@ -1,10 +1,8 @@
 ﻿using DevExpress.ExpressApp;
-using DevExpress.Data.Filtering;
-using DevExpress.Persistent.Base;
-using DevExpress.ExpressApp.Updating;
 using DevExpress.ExpressApp.Security;
 using DevExpress.ExpressApp.SystemModule;
-using DevExpress.ExpressApp.EF;
+using DevExpress.ExpressApp.Updating;
+using DevExpress.Persistent.Base;
 using DevExpress.Persistent.BaseImpl.EF;
 using DevExpress.Persistent.BaseImpl.EF.PermissionPolicy;
 using Fide.Module.BusinessObjects;
@@ -13,11 +11,14 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Fide.Module.DatabaseUpdate;
 
 // For more typical usage scenarios, be sure to check out https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.Updating.ModuleUpdater
-public class Updater : ModuleUpdater {
+public class Updater : ModuleUpdater
+{
     public Updater(IObjectSpace objectSpace, Version currentDBVersion) :
-        base(objectSpace, currentDBVersion) {
+        base(objectSpace, currentDBVersion)
+    {
     }
-    public override void UpdateDatabaseAfterUpdateSchema() {
+    public override void UpdateDatabaseAfterUpdateSchema()
+    {
         base.UpdateDatabaseAfterUpdateSchema();
         //string name = "MyName";
         //EntityObject1 theObject = ObjectSpace.FirstOrDefault<EntityObject1>(u => u.Name == name);
@@ -39,20 +40,24 @@ public class Updater : ModuleUpdater {
         UserManager userManager = ObjectSpace.ServiceProvider.GetRequiredService<UserManager>();
 
         // If a user named 'User' doesn't exist in the database, create this user
-        if(userManager.FindUserByName<ApplicationUser>(ObjectSpace, "User") == null) {
+        if (userManager.FindUserByName<ApplicationUser>(ObjectSpace, "User") == null)
+        {
             // Set a password if the standard authentication type is used
             string EmptyPassword = "";
-            _ = userManager.CreateUser<ApplicationUser>(ObjectSpace, "User", EmptyPassword, (user) => {
+            _ = userManager.CreateUser<ApplicationUser>(ObjectSpace, "User", EmptyPassword, (user) =>
+            {
                 // Add the Users role to the user
                 user.Roles.Add(defaultRole);
             });
         }
 
         // If a user named 'Admin' doesn't exist in the database, create this user
-        if(userManager.FindUserByName<ApplicationUser>(ObjectSpace, "Admin") == null) {
+        if (userManager.FindUserByName<ApplicationUser>(ObjectSpace, "Admin") == null)
+        {
             // Set a password if the standard authentication type is used
             string EmptyPassword = "";
-            _ = userManager.CreateUser<ApplicationUser>(ObjectSpace, "Admin", EmptyPassword, (user) => {
+            _ = userManager.CreateUser<ApplicationUser>(ObjectSpace, "Admin", EmptyPassword, (user) =>
+            {
                 // Add the Administrators role to the user
                 user.Roles.Add(adminRole);
             });
@@ -61,21 +66,26 @@ public class Updater : ModuleUpdater {
         ObjectSpace.CommitChanges(); //This line persists created object(s).
 #endif
     }
-    public override void UpdateDatabaseBeforeUpdateSchema() {
+    public override void UpdateDatabaseBeforeUpdateSchema()
+    {
         base.UpdateDatabaseBeforeUpdateSchema();
     }
-    private PermissionPolicyRole CreateAdminRole() {
+    private PermissionPolicyRole CreateAdminRole()
+    {
         PermissionPolicyRole adminRole = ObjectSpace.FirstOrDefault<PermissionPolicyRole>(r => r.Name == "Administrators");
-        if(adminRole == null) {
+        if (adminRole == null)
+        {
             adminRole = ObjectSpace.CreateObject<PermissionPolicyRole>();
             adminRole.Name = "Administrators";
             adminRole.IsAdministrative = true;
         }
         return adminRole;
     }
-    private PermissionPolicyRole CreateDefaultRole() {
+    private PermissionPolicyRole CreateDefaultRole()
+    {
         PermissionPolicyRole defaultRole = ObjectSpace.FirstOrDefault<PermissionPolicyRole>(role => role.Name == "Default");
-        if(defaultRole == null) {
+        if (defaultRole == null)
+        {
             defaultRole = ObjectSpace.CreateObject<PermissionPolicyRole>();
             defaultRole.Name = "Default";
 
