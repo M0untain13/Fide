@@ -19,8 +19,6 @@ public class Startup
 
     public IConfiguration Configuration { get; }
 
-    // This method gets called by the runtime. Use this method to add services to the container.
-    // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton(typeof(Microsoft.AspNetCore.SignalR.HubConnectionHandler<>), typeof(ProxyHubConnectionHandler<>));
@@ -50,12 +48,7 @@ public class Startup
                 .AddSecuredEFCore(options => options.PreFetchReferenceProperties())
                     .WithDbContext<Fide.Module.BusinessObjects.FideEFCoreDbContext>((serviceProvider, options) =>
                     {
-                        // Uncomment this code to use an in-memory database. This database is recreated each time the server starts. With the in-memory database, you don't need to make a migration when the data model is changed.
-                        // Do not use this code in production environment to avoid data loss.
-                        // We recommend that you refer to the following help topic before you use an in-memory database: https://docs.microsoft.com/en-us/ef/core/testing/in-memory
-                        //options.UseInMemoryDatabase("InMemory");
-                        string connectionString = Environment.GetEnvironmentVariable("ConnectionString");
-
+                        var connectionString = Configuration.GetConnectionString("database");
                         ArgumentNullException.ThrowIfNull(connectionString);
                         options.UseSqlServer(connectionString);
                         options.UseChangeTrackingProxies();
