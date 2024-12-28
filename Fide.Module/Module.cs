@@ -1,5 +1,6 @@
 ﻿using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.Updating;
+using Fide.Module.BusinessObjects.Security;
 
 namespace Fide.Module;
 
@@ -8,10 +9,7 @@ public sealed class FideModule : ModuleBase
 {
     public FideModule()
     {
-        //
-        // FideModule
-        //
-        AdditionalExportedTypes.Add(typeof(Fide.Module.BusinessObjects.ApplicationUser));
+        AdditionalExportedTypes.Add(typeof(ApplicationUser));
         AdditionalExportedTypes.Add(typeof(DevExpress.Persistent.BaseImpl.EF.PermissionPolicy.PermissionPolicyRole));
         AdditionalExportedTypes.Add(typeof(DevExpress.Persistent.BaseImpl.EF.ModelDifference));
         AdditionalExportedTypes.Add(typeof(DevExpress.Persistent.BaseImpl.EF.ModelDifferenceAspect));
@@ -26,11 +24,13 @@ public sealed class FideModule : ModuleBase
         AdditionalExportedTypes.Add(typeof(DevExpress.Persistent.BaseImpl.EF.FileData));
         AdditionalExportedTypes.Add(typeof(DevExpress.Persistent.BaseImpl.EF.FileAttachment));
     }
+
     public override IEnumerable<ModuleUpdater> GetModuleUpdaters(IObjectSpace objectSpace, Version versionFromDB)
     {
         ModuleUpdater updater = new DatabaseUpdate.Updater(objectSpace, versionFromDB);
-        return new ModuleUpdater[] { updater };
+        return [updater];
     }
+
     public override void Setup(XafApplication application)
     {
         base.Setup(application);

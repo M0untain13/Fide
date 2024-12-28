@@ -4,7 +4,7 @@ using DevExpress.Persistent.BaseImpl.EF.PermissionPolicy;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Fide.Module.BusinessObjects;
+namespace Fide.Module.BusinessObjects.Security;
 
 [DefaultProperty(nameof(UserName))]
 public class ApplicationUser : PermissionPolicyUser, ISecurityUserWithLoginInfo, ISecurityUserLockout

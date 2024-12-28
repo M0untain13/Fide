@@ -4,6 +4,8 @@ using DevExpress.ExpressApp.Blazor.Services;
 using DevExpress.ExpressApp.Security;
 using DevExpress.Persistent.BaseImpl.EF.PermissionPolicy;
 using Fide.Blazor.Server.Services;
+using Fide.Module.BusinessObjects.DbContext;
+using Fide.Module.BusinessObjects.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +48,7 @@ public class Startup
                 .Add<FideBlazorModule>();
             builder.ObjectSpaceProviders
                 .AddSecuredEFCore(options => options.PreFetchReferenceProperties())
-                    .WithDbContext<Fide.Module.BusinessObjects.FideEFCoreDbContext>((serviceProvider, options) =>
+                    .WithDbContext<FideEFCoreDbContext>((serviceProvider, options) =>
                     {
                         var connectionString = Configuration.GetConnectionString("database");
                         ArgumentNullException.ThrowIfNull(connectionString);
@@ -64,10 +66,10 @@ public class Startup
                     options.RoleType = typeof(PermissionPolicyRole);
                     // ApplicationUser descends from PermissionPolicyUser and supports the OAuth authentication. For more information, refer to the following topic: https://docs.devexpress.com/eXpressAppFramework/402197
                     // If your application uses PermissionPolicyUser or a custom user type, set the UserType property as follows:
-                    options.UserType = typeof(Fide.Module.BusinessObjects.ApplicationUser);
+                    options.UserType = typeof(ApplicationUser);
                     // ApplicationUserLoginInfo is only necessary for applications that use the ApplicationUser user type.
                     // If you use PermissionPolicyUser or a custom user type, comment out the following line:
-                    options.UserLoginInfoType = typeof(Fide.Module.BusinessObjects.ApplicationUserLoginInfo);
+                    options.UserLoginInfoType = typeof(ApplicationUserLoginInfo);
                     options.Events.OnSecurityStrategyCreated += securityStrategy =>
                     {
                         // Use the 'PermissionsReloadMode.NoCache' option to load the most recent permissions from the database once

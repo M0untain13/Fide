@@ -5,7 +5,7 @@ using DevExpress.ExpressApp.Updating;
 using DevExpress.Persistent.Base;
 using DevExpress.Persistent.BaseImpl.EF;
 using DevExpress.Persistent.BaseImpl.EF.PermissionPolicy;
-using Fide.Module.BusinessObjects;
+using Fide.Module.BusinessObjects.Security;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Fide.Module.DatabaseUpdate;
