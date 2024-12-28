@@ -4,7 +4,7 @@ using DevExpress.ExpressApp.Blazor.Services;
 using DevExpress.ExpressApp.Security;
 using DevExpress.Persistent.BaseImpl.EF.PermissionPolicy;
 using Fide.Blazor.Server.Services;
-using Fide.Module.BusinessObjects.DbContext;
+using Fide.Module.BusinessObjects.Context;
 using Fide.Module.BusinessObjects.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Server.Circuits;

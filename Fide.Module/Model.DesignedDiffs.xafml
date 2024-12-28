@@ -1,12 +1,62 @@
-﻿<?xml version="1.0" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Application Title="Fide">
   <BOModel>
     <Class Name="DevExpress.Persistent.BaseImpl.EF.PermissionPolicy.PermissionPolicyUser" Caption="Base User" />
+    <Class Name="Fide.Module.BusinessObjects.AnalysisResult" DefaultDetailViewImage="Actions_Zoom" ImageName="Actions_Zoom">
+      <OwnMembers>
+        <Member Name="AnalysisType" AllowEdit="False" />
+        <Member Name="Files" AllowEdit="False" />
+        <Member Name="Information" AllowEdit="False" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Fide.Module.BusinessObjects.ImageAnalysis" ImageName="Images" />
   </BOModel>
+  <NavigationItems>
+    <Items>
+      <Item Id="MyProfile" IsNewNode="True">
+        <Items IsNewNode="True">
+          <Item Id="MyImages" ViewId="ImageAnalysis_ListView_MyImages" IsNewNode="True" />
+          <Item Id="MyInfo" ViewId="" IsNewNode="True" />
+        </Items>
+      </Item>
+      <Item Id="Shared" IsNewNode="True">
+        <Items IsNewNode="True">
+          <Item Id="SharedImages" ViewId="ImageAnalysis_ListView_SharedImages" IsNewNode="True" />
+        </Items>
+      </Item>
+    </Items>
+  </NavigationItems>
   <Options>
     <LayoutManagerOptions RequiredFieldMark="*" />
   </Options>
+  <SchemaModules>
+    <SchemaModule Name="SystemModule" Version="24.2.3.0" IsNewNode="True" />
+  </SchemaModules>
   <Views>
     <ListView Id="ApplicationUser_ListView" Caption="Users" />
+    <ListView Id="ImageAnalysis_ListView_MyImages" ClassName="Fide.Module.BusinessObjects.ImageAnalysis" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="CreationDate" PropertyName="CreationDate" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Image" PropertyName="Image" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="Owner" PropertyName="Owner" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="IsShared" PropertyName="IsShared" Index="2" IsNewNode="True" />
+      </Columns>
+      <Filters IsNewNode="True">
+        <Filter Id="MyImages" ImageName="BO_Person" Criteria="[Owner.ID] = CURRENTUSERID()" IsNewNode="True" />
+      </Filters>
+    </ListView>
+    <ListView Id="ImageAnalysis_ListView_SharedImages" ClassName="Fide.Module.BusinessObjects.ImageAnalysis" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="CreationDate" PropertyName="CreationDate" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Image" PropertyName="Image" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="Owner" PropertyName="Owner" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="IsShared" PropertyName="IsShared" Index="2" IsNewNode="True" />
+      </Columns>
+      <Filters IsNewNode="True">
+        <Filter Id="SharedImages" ImageName="BO_Department" Criteria="[IsShared] = True" IsNewNode="True" />
+      </Filters>
+    </ListView>
   </Views>
 </Application>

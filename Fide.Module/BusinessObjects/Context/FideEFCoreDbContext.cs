@@ -17,7 +17,8 @@ public class FideEFCoreDbContext : DbContext
     public DbSet<ApplicationUser> Users { get; set; }
     public DbSet<ApplicationUserLoginInfo> UserLoginInfos { get; set; }
     public DbSet<FileData> FileData { get; set; }
-
+    public DbSet<ImageAnalysis> ImageAnalysis { get; set; }
+    public DbSet<AnalysisResult> AnalysisResult { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

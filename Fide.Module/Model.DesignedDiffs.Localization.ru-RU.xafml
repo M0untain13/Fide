@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application>
+  <BOModel>
+    <Class Name="Fide.Module.BusinessObjects.AnalysisResult" Caption="Результат анализа">
+      <OwnMembers>
+        <Member Name="AnalysisType" Caption="Тип анализа" />
+        <Member Name="Files" Caption="Файлы" />
+        <Member Name="Information" Caption="Информация" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Fide.Module.BusinessObjects.Base.FideBaseObject">
+      <OwnMembers>
+        <Member Name="CreationDate" Caption="Дата создания объекта" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Fide.Module.BusinessObjects.ImageAnalysis" Caption="Анализ изображения">
+      <OwnMembers>
+        <Member Name="Image" Caption="Изображение" />
+        <Member Name="Owner" Caption="Владелец" />
+        <Member Name="Results" Caption="Результаты анализа" />
+      </OwnMembers>
+    </Class>
+  </BOModel>
+  <Localization>
+    <LocalizationGroup Name="Enums">
+      <LocalizationGroup Name="Fide.Module.Enums.AnalysisEnum">
+        <LocalizationItem Name="ELA" Value="Анализ уровня ошибок" />
+        <LocalizationItem Name="Metadata" Value="Анализ метаданных" />
+      </LocalizationGroup>
+    </LocalizationGroup>
+  </Localization>
+  <NavigationItems>
+    <Items>
+      <Item Id="MyProfile" Caption="Мой профиль">
+        <Items>
+          <Item Id="MyImages" Caption="Мои изображения" />
+          <Item Id="MyInfo" Caption="Обо мне" />
+        </Items>
+      </Item>
+      <Item Id="Shared" Caption="Публичное">
+        <Items>
+          <Item Id="SharedImages" Caption="Публичные изображения" />
+        </Items>
+      </Item>
+    </Items>
+  </NavigationItems>
+  <Views>
+    <ListView Id="ImageAnalysis_ListView_MyImages">
+      <Filters>
+        <Filter Id="MyImages" Caption="Мои изображения" />
+      </Filters>
+    </ListView>
+    <ListView Id="ImageAnalysis_ListView_SharedImages">
+      <Filters>
+        <Filter Id="SharedImages" Caption="Публичные изображения" />
+      </Filters>
+    </ListView>
+  </Views>
+</Application>
