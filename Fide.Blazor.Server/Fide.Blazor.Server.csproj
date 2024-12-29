@@ -24,6 +24,7 @@
     <PackageReference Include="DevExpress.ExpressApp.Notifications.Blazor" Version="24.2.3" />
     <PackageReference Include="DevExpress.ExpressApp.Validation.Blazor" Version="24.2.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fide.Module\Fide.Module.csproj" />

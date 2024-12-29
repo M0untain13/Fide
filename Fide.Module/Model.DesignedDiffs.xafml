@@ -9,14 +9,23 @@
         <Member Name="Information" AllowEdit="False" />
       </OwnMembers>
     </Class>
-    <Class Name="Fide.Module.BusinessObjects.ImageAnalysis" ImageName="Images" />
+    <Class Name="Fide.Module.BusinessObjects.Base.FideBaseObject">
+      <OwnMembers>
+        <Member Name="CreationDate" AllowEdit="False" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Fide.Module.BusinessObjects.ImageAnalysis" ImageName="Images">
+      <OwnMembers>
+        <Member Name="Owner" AllowEdit="False" />
+        <Member Name="Results" AllowEdit="False" />
+      </OwnMembers>
+    </Class>
   </BOModel>
   <NavigationItems>
     <Items>
       <Item Id="MyProfile" IsNewNode="True">
         <Items IsNewNode="True">
           <Item Id="MyImages" ViewId="ImageAnalysis_ListView_MyImages" IsNewNode="True" />
-          <Item Id="MyInfo" ViewId="" IsNewNode="True" />
         </Items>
       </Item>
       <Item Id="Shared" IsNewNode="True">
@@ -42,7 +51,7 @@
         <ColumnInfo Id="Owner" PropertyName="Owner" Index="1" IsNewNode="True" />
         <ColumnInfo Id="IsShared" PropertyName="IsShared" Index="2" IsNewNode="True" />
       </Columns>
-      <Filters IsNewNode="True">
+      <Filters CurrentFilterId="MyImages" IsNewNode="True">
         <Filter Id="MyImages" ImageName="BO_Person" Criteria="[Owner.ID] = CURRENTUSERID()" IsNewNode="True" />
       </Filters>
     </ListView>
@@ -54,9 +63,13 @@
         <ColumnInfo Id="Owner" PropertyName="Owner" Index="1" IsNewNode="True" />
         <ColumnInfo Id="IsShared" PropertyName="IsShared" Index="2" IsNewNode="True" />
       </Columns>
-      <Filters IsNewNode="True">
+      <Filters CurrentFilterId="SharedImages" IsNewNode="True">
         <Filter Id="SharedImages" ImageName="BO_Department" Criteria="[IsShared] = True" IsNewNode="True" />
       </Filters>
+      <HiddenActions IsNewNode="True">
+        <ActionLink ActionId="Delete" IsNewNode="True" />
+        <ActionLink ActionId="New" IsNewNode="True" />
+      </HiddenActions>
     </ListView>
   </Views>
 </Application>

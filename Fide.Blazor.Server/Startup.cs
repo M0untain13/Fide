@@ -29,7 +29,7 @@ public class Startup
         services.AddServerSideBlazor();
         services.AddHttpContextAccessor();
         services.AddScoped<CircuitHandler, CircuitHandlerProxy>();
-        services.AddXaf(Configuration, builder =>
+        _ = services.AddXaf(Configuration, builder =>
         {
             builder.UseApplication<FideBlazorApplication>();
             builder.Modules
@@ -51,8 +51,19 @@ public class Startup
                     .WithDbContext<FideEFCoreDbContext>((serviceProvider, options) =>
                     {
                         var connectionString = Configuration.GetConnectionString("database");
-                        ArgumentNullException.ThrowIfNull(connectionString);
-                        options.UseSqlServer(connectionString);
+                        var logger = serviceProvider.GetService<ILogger>();
+
+                        if (connectionString is null)
+                        {
+                            logger?.LogError("Строка подключения пустая.");
+                            options.UseInMemoryDatabase("InMemory");
+                        }
+                        else
+                        {
+                            logger?.LogInformation($"Строка подключения: '{connectionString}'.");
+                            options.UseNpgsql(connectionString);
+                        }
+
                         options.UseChangeTrackingProxies();
                         options.UseObjectSpaceLinkProxies();
                         options.UseLazyLoadingProxies();

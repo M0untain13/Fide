@@ -4,11 +4,12 @@ namespace Fide.Module.BusinessObjects.Base;
 
 public class FideBaseObject : BaseObject
 {
-    private readonly DateTime _creationDate;
-    public DateTime CreationDate => _creationDate;
+    public virtual DateTime CreationDate { get; set; }
 
-    public FideBaseObject() : base()
+    public override void OnCreated()
     {
-        _creationDate = DateTime.Now;
+        base.OnCreated();
+
+        CreationDate = DateTime.UtcNow;
     }
 }

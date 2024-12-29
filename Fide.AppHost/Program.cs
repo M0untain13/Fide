@@ -1,10 +1,11 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var sqlServer = builder
-    .AddSqlServer("sqlserver")   
+var postgres = builder
+    .AddPostgres("postgres")
+    .WithPgAdmin()
     .WithLifetime(ContainerLifetime.Persistent);
 
-var db = sqlServer
+var db = postgres
     .AddDatabase("database");
 
 builder.AddProject<Projects.Fide_Blazor_Server>("app")

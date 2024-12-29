@@ -34,7 +34,6 @@
       <Item Id="MyProfile" Caption="Мой профиль">
         <Items>
           <Item Id="MyImages" Caption="Мои изображения" />
-          <Item Id="MyInfo" Caption="Обо мне" />
         </Items>
       </Item>
       <Item Id="Shared" Caption="Публичное">
