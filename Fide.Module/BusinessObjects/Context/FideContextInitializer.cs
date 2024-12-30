@@ -10,7 +10,7 @@ public class FideContextInitializer : DbContextTypesInfoInitializerBase
     protected override DbContext CreateDbContext()
     {
         var optionsBuilder = new DbContextOptionsBuilder<FideEFCoreDbContext>()
-            .UseSqlServer(";")
+            .UseNpgsql(";")
             .UseChangeTrackingProxies()
             .UseObjectSpaceLinkProxies();
         return new FideEFCoreDbContext(optionsBuilder.Options);

@@ -31,25 +31,27 @@
   </Localization>
   <NavigationItems>
     <Items>
-      <Item Id="MyProfile" Caption="Мой профиль">
+      <Item Id="MyAccount" Caption="Мой аккаунт" />
+      <Item Id="Security" Caption="Безопасность">
         <Items>
-          <Item Id="MyImages" Caption="Мои изображения" />
-        </Items>
-      </Item>
-      <Item Id="Shared" Caption="Публичное">
-        <Items>
-          <Item Id="SharedImages" Caption="Публичные изображения" />
+          <Item Id="Roles" Caption="Роли" />
+          <Item Id="Users" Caption="Пользователи" />
         </Items>
       </Item>
     </Items>
   </NavigationItems>
+  <Validation>
+    <Rules>
+      <RuleRequiredField Id="RequiredField_ImageAnalysis_Image" CustomMessageTemplate="Изображение должно быть загружено" />
+    </Rules>
+  </Validation>
   <Views>
-    <ListView Id="ImageAnalysis_ListView_MyImages">
+    <ListView Id="ImageAnalysis_ListView_MyImages" Caption="Мои изображения">
       <Filters>
         <Filter Id="MyImages" Caption="Мои изображения" />
       </Filters>
     </ListView>
-    <ListView Id="ImageAnalysis_ListView_SharedImages">
+    <ListView Id="ImageAnalysis_ListView_SharedImages" Caption="Публичные изображения">
       <Filters>
         <Filter Id="SharedImages" Caption="Публичные изображения" />
       </Filters>

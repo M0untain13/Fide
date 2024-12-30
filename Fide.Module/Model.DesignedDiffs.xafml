@@ -15,6 +15,10 @@
       </OwnMembers>
     </Class>
     <Class Name="Fide.Module.BusinessObjects.ImageAnalysis" ImageName="Images">
+      <AppearanceRules>
+        <AppearanceRule Id="DisableFieldsIfNotMyImage" TargetItems="*" Enabled="False" Criteria="[Owner.ID] &lt;&gt; CURRENTUSERID()" IsNewNode="True" />
+        <AppearanceRule Id="DisableImageUploadingWhenAlreadyUpload" Enabled="False" TargetItems="Image" Criteria="[Image] Is Not Null" IsNewNode="True" />
+      </AppearanceRules>
       <OwnMembers>
         <Member Name="Owner" AllowEdit="False" />
         <Member Name="Results" AllowEdit="False" />
@@ -23,14 +27,13 @@
   </BOModel>
   <NavigationItems>
     <Items>
-      <Item Id="MyProfile" IsNewNode="True">
+      <Item Id="MyAccount" ViewId="ApplicationUser_DetailView" ObjectKey="@CurrentUserID" Index="0" IsNewNode="True" />
+      <Item Id="MyImages" ViewId="ImageAnalysis_ListView_MyImages" Index="1" IsNewNode="True" />
+      <Item Id="SharedImages" ViewId="ImageAnalysis_ListView_SharedImages" Index="2" IsNewNode="True" />
+      <Item Id="Security" Index="3" IsNewNode="True">
         <Items IsNewNode="True">
-          <Item Id="MyImages" ViewId="ImageAnalysis_ListView_MyImages" IsNewNode="True" />
-        </Items>
-      </Item>
-      <Item Id="Shared" IsNewNode="True">
-        <Items IsNewNode="True">
-          <Item Id="SharedImages" ViewId="ImageAnalysis_ListView_SharedImages" IsNewNode="True" />
+          <Item Id="Roles" Index="0" ViewId="PermissionPolicyRole_ListView" IsNewNode="True" />
+          <Item Id="Users" Index="1" ViewId="ApplicationUser_ListView" IsNewNode="True" />
         </Items>
       </Item>
     </Items>
@@ -41,9 +44,14 @@
   <SchemaModules>
     <SchemaModule Name="SystemModule" Version="24.2.3.0" IsNewNode="True" />
   </SchemaModules>
+  <Validation>
+    <Rules>
+      <RuleRequiredField Id="RequiredField_ImageAnalysis_Image" TargetContextIDs="Save" TargetType="Fide.Module.BusinessObjects.ImageAnalysis" TargetPropertyName="Image" IsNewNode="True" />
+    </Rules>
+  </Validation>
   <Views>
     <ListView Id="ApplicationUser_ListView" Caption="Users" />
-    <ListView Id="ImageAnalysis_ListView_MyImages" ClassName="Fide.Module.BusinessObjects.ImageAnalysis" IsNewNode="True">
+    <ListView Id="ImageAnalysis_ListView_MyImages" ClassName="Fide.Module.BusinessObjects.ImageAnalysis" AllowLink="False" AllowUnlink="False" IsNewNode="True">
       <Columns IsNewNode="True">
         <ColumnInfo Id="CreationDate" PropertyName="CreationDate" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="ID" PropertyName="ID" Index="-1" IsNewNode="True" />
@@ -55,7 +63,7 @@
         <Filter Id="MyImages" ImageName="BO_Person" Criteria="[Owner.ID] = CURRENTUSERID()" IsNewNode="True" />
       </Filters>
     </ListView>
-    <ListView Id="ImageAnalysis_ListView_SharedImages" ClassName="Fide.Module.BusinessObjects.ImageAnalysis" IsNewNode="True">
+    <ListView Id="ImageAnalysis_ListView_SharedImages" ClassName="Fide.Module.BusinessObjects.ImageAnalysis" DataAccessMode="Server" AllowDelete="False" AllowLink="False" AllowNew="False" IsNewNode="True">
       <Columns IsNewNode="True">
         <ColumnInfo Id="CreationDate" PropertyName="CreationDate" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="ID" PropertyName="ID" Index="-1" IsNewNode="True" />
