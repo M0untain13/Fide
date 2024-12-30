@@ -5,8 +5,10 @@ namespace Fide.Module.Helpers;
 
 public static class CurrentUserHelper
 {
-    public static ApplicationUser GetCurrentUser()
+    public static ApplicationUser GetCurrentUser(IObjectSpace objectSpace)
     {
-        return SecuritySystem.CurrentUser as ApplicationUser;
+        var users = objectSpace.GetObjectsQuery<ApplicationUser>();
+        var currentUser = users.First(u => u.ID == (SecuritySystem.CurrentUser as ApplicationUser).ID);
+        return currentUser;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DevExpress.ExpressApp.Design;
+using DevExpress.ExpressApp.EFCore.Updating;
 using DevExpress.Persistent.BaseImpl.EF;
 using DevExpress.Persistent.BaseImpl.EF.PermissionPolicy;
 using Fide.Module.BusinessObjects.Security;
@@ -10,7 +11,7 @@ namespace Fide.Module.BusinessObjects.Context;
 public class FideEFCoreDbContext : DbContext
 {
     public FideEFCoreDbContext(DbContextOptions<FideEFCoreDbContext> options) : base(options) { }
-    //public DbSet<ModuleInfo> ModulesInfo { get; set; }
+    public DbSet<ModuleInfo> ModulesInfo { get; set; }
     public DbSet<ModelDifference> ModelDifferences { get; set; }
     public DbSet<ModelDifferenceAspect> ModelDifferenceAspects { get; set; }
     public DbSet<PermissionPolicyRole> Roles { get; set; }
