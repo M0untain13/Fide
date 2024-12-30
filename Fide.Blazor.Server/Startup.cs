@@ -6,6 +6,7 @@ using DevExpress.Persistent.BaseImpl.EF.PermissionPolicy;
 using Fide.Blazor.Server.Services;
 using Fide.Module.BusinessObjects.Context;
 using Fide.Module.BusinessObjects.Security;
+using Fide.Module.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton(typeof(Microsoft.AspNetCore.SignalR.HubConnectionHandler<>), typeof(ProxyHubConnectionHandler<>));
+        services.AddSingleton<IAnalysisService, AnalysisService>();
 
         services.AddRazorPages();
         services.AddServerSideBlazor();
@@ -44,7 +46,7 @@ public class Startup
                 {
                     options.ShowAdditionalNavigation = true;
                 })
-                .Add<Fide.Module.FideModule>()
+                .Add<Module.FideModule>()
                 .Add<FideBlazorModule>();
             builder.ObjectSpaceProviders
                 .AddSecuredEFCore(options => options.PreFetchReferenceProperties())

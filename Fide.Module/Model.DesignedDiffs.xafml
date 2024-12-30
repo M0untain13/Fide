@@ -24,6 +24,7 @@
         <Member Name="Results" AllowEdit="False" />
       </OwnMembers>
     </Class>
+    <Class Name="Fide.Module.NonPersistentObjects.SelectImageForAnalysis" ImageName="MarqueeZoom" />
   </BOModel>
   <NavigationItems>
     <Items>

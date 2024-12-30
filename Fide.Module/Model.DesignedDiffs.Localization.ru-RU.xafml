@@ -20,6 +20,12 @@
         <Member Name="Results" Caption="Результаты анализа" />
       </OwnMembers>
     </Class>
+    <Class Name="Fide.Module.NonPersistentObjects.SelectImageForAnalysis" Caption="Анализировать">
+      <OwnMembers>
+        <Member Name="SelectedAnalysisTypes" Caption="Выбранные типы анализа" />
+        <Member Name="SelectedImage" Caption="Выбранное изображение" />
+      </OwnMembers>
+    </Class>
   </BOModel>
   <Localization>
     <LocalizationGroup Name="Enums">
