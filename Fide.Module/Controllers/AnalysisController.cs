@@ -61,6 +61,8 @@ public partial class AnalysisController : ViewController<DetailView>
             var selectedImageAnalysis = selectImageForAnalysis.SelectedImage;
             var analysisService = ObjectSpace.ServiceProvider.GetService(typeof(IAnalysisService)) as IAnalysisService;
             analysisService.StartAnalysis(selectImageForAnalysis);
+            ObjectSpace.CommitChanges();
+            View.Refresh();
         };
     }
 }

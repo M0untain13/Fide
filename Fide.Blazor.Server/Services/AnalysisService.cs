@@ -22,15 +22,18 @@ public class AnalysisService : IAnalysisService
     public void StartAnalysis(SelectImageForAnalysis selectImageForAnalysis)
     {
         var analysisTypes = selectImageForAnalysis.SelectedAnalysisTypes.Select(a => a.AnalysisType).Distinct();
+
         foreach (var analysisType in analysisTypes)
         {
-            if (_analyzers.TryGetValue(analysisType, out var analyzer)
-                && !selectImageForAnalysis.SelectedImage.Results.Select(r => r.AnalysisType).Contains(analysisType))
+            if (_analyzers.TryGetValue(analysisType, out var analyzer))
             {
-                var results = analyzer.Invoke(selectImageForAnalysis.SelectedImage.Image);
-                foreach (var result in results)
+                if (!selectImageForAnalysis.SelectedImage.Results.Select(r => r.AnalysisType).Contains(analysisType))
                 {
-                    selectImageForAnalysis.SelectedImage.Results.Add(result);
+                    var results = analyzer.Invoke(selectImageForAnalysis.SelectedImage.Image);
+                    foreach (var result in results)
+                    {
+                        selectImageForAnalysis.SelectedImage.Results.Add(result);
+                    }
                 }
             }
             else
@@ -47,6 +50,7 @@ public class AnalysisService : IAnalysisService
             Information = "EXIF Test",
             AnalysisType = AnalysisEnum.Metadata,
         };
+        result.OnCreated();
         return [result];
     }
 
@@ -57,6 +61,8 @@ public class AnalysisService : IAnalysisService
             Information = "ELA Test",
             AnalysisType = AnalysisEnum.ELA,
         };
+        result.Files.Add(fileData);
+        result.OnCreated();
         return [result];
     }
 }
