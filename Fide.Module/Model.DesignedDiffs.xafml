@@ -114,5 +114,19 @@
         <ActionLink ActionId="New" IsNewNode="True" />
       </HiddenActions>
     </ListView>
+    <DetailView Id="SelectImageForAnalysis_DetailView">
+      <Items>
+        <PropertyEditor Id="SelectedImage" Removed="True" />
+      </Items>
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutItem Id="SelectedAnalysisTypes" ViewItem="SelectedAnalysisTypes" ShowCaption="" Index="0" IsNewNode="True" />
+          <LayoutGroup Id="SelectedAnalysisTypes_Group" Removed="True">
+            <LayoutItem Id="SelectedAnalysisTypes" Removed="True" />
+          </LayoutGroup>
+          <LayoutGroup Id="SimpleEditors" Removed="True" />
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
   </Views>
 </Application>
