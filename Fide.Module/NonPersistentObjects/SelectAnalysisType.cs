@@ -1,15 +1,16 @@
 ﻿using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.DC;
-using Fide.Module.BusinessObjects;
+using DevExpress.Persistent.Base;
+using Fide.Module.Enums;
 using System.ComponentModel;
 
 namespace Fide.Module.NonPersistentObjects
 {
     [DomainComponent]
-    [DefaultProperty(nameof(SelectedImage))]
-    public class SelectImageForAnalysis : IXafEntityObject, IObjectSpaceLink, INotifyPropertyChanged
+    [DefaultProperty(nameof(AnalysisType))]
+    public class SelectAnalysisType : IXafEntityObject, INotifyPropertyChanged
     {
-        public SelectImageForAnalysis()
+        public SelectAnalysisType()
         {
             Oid = Guid.NewGuid();
         }
@@ -18,12 +19,7 @@ namespace Fide.Module.NonPersistentObjects
         [Browsable(false)]
         public Guid Oid { get; set; }
 
-        [Browsable(false)]
-        public IObjectSpace ObjectSpace { get; set; }
-
-        public ImageAnalysis SelectedImage { get; set; }
-
-        public IList<SelectAnalysisType> SelectedAnalysisTypes { get; set; } = [];
+        public AnalysisEnum AnalysisType { get; set; }
 
         #region IXafEntityObject members (see https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.IXafEntityObject)
         void IXafEntityObject.OnCreated()

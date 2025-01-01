@@ -31,7 +31,7 @@
       <Item Id="MyAccount" ViewId="ApplicationUser_DetailView" ObjectKey="@CurrentUserID" Index="0" IsNewNode="True" />
       <Item Id="MyImages" ViewId="ImageAnalysis_ListView_MyImages" Index="1" IsNewNode="True" />
       <Item Id="SharedImages" ViewId="ImageAnalysis_ListView_SharedImages" Index="2" IsNewNode="True" />
-      <Item Id="Security" Index="3" IsNewNode="True">
+      <Item Id="Security" Index="3" ImageName="BO_Attention" IsNewNode="True">
         <Items IsNewNode="True">
           <Item Id="Roles" Index="0" ViewId="PermissionPolicyRole_ListView" IsNewNode="True" />
           <Item Id="Users" Index="1" ViewId="ApplicationUser_ListView" IsNewNode="True" />
@@ -52,6 +52,40 @@
   </Validation>
   <Views>
     <ListView Id="ApplicationUser_ListView" Caption="Users" />
+    <DetailView Id="ImageAnalysis_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="MainContent" Index="0" HorizontalAlign="NotSet" Direction="Horizontal" IsNewNode="True">
+            <LayoutGroup Id="ImageData" Index="0" ShowCaption="True" IsNewNode="True">
+              <LayoutItem Id="Image" ViewItem="Image" ShowCaption="False" Index="0" IsNewNode="True" />
+              <LayoutItem Id="ShowImage" ViewItem="ShowImage" ShowCaption="False" Index="1" IsNewNode="True" />
+              <LayoutItem Id="IsShared" ViewItem="IsShared" ShowCaption="" Index="2" IsNewNode="True" />
+            </LayoutGroup>
+            <LayoutGroup Id="Info" Index="1" ShowCaption="True" IsNewNode="True">
+              <LayoutItem Id="CreationDate" ViewItem="CreationDate" ShowCaption="" Index="0" IsNewNode="True" />
+              <LayoutItem Id="Owner" ViewItem="Owner" ShowCaption="" Index="2" IsNewNode="True" />
+            </LayoutGroup>
+          </LayoutGroup>
+          <LayoutGroup Id="ResultGroup" Index="1" ShowCaption="True" IsNewNode="True">
+            <LayoutItem Id="Results" ViewItem="Results" ShowCaption="" Index="0" IsNewNode="True" />
+          </LayoutGroup>
+          <LayoutGroup Id="Results_Group" Removed="True">
+            <LayoutItem Id="Results" Removed="True" />
+          </LayoutGroup>
+          <LayoutGroup Id="SimpleEditors" Removed="True">
+            <LayoutGroup Id="FideBaseObject">
+              <LayoutItem Id="CreationDate" Removed="True" />
+            </LayoutGroup>
+            <LayoutGroup Id="ImageAnalysis">
+              <LayoutItem Id="Image" Removed="True" />
+              <LayoutItem Id="IsShared" Removed="True" />
+              <LayoutItem Id="Owner" Removed="True" />
+              <LayoutItem Id="ShowImage" Removed="True" />
+            </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
     <ListView Id="ImageAnalysis_ListView_MyImages" ClassName="Fide.Module.BusinessObjects.ImageAnalysis" AllowLink="False" AllowUnlink="False" IsNewNode="True">
       <Columns IsNewNode="True">
         <ColumnInfo Id="CreationDate" PropertyName="CreationDate" Index="-1" IsNewNode="True" />

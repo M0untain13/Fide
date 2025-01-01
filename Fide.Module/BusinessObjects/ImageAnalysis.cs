@@ -1,14 +1,10 @@
-﻿using DevExpress.ExpressApp;
-using DevExpress.ExpressApp.DC;
+﻿using DevExpress.ExpressApp.DC;
 using DevExpress.Persistent.Base;
 using DevExpress.Persistent.BaseImpl.EF;
 using Fide.Module.BusinessObjects.Base;
-using Fide.Module.BusinessObjects.Context;
 using Fide.Module.BusinessObjects.Security;
 using Fide.Module.Helpers;
 using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel;
 
 namespace Fide.Module.BusinessObjects;
 
@@ -18,7 +14,10 @@ public class ImageAnalysis : FideBaseObject
     [Aggregated]
     public virtual IList<AnalysisResult> Results { get; set; } = new ObservableCollection<AnalysisResult>();
     public virtual bool IsShared { get; set; }
-    public virtual ApplicationUser Owner { get; set; } 
+    public virtual ApplicationUser Owner { get; set; }
+
+    [ImageEditor]
+    public byte[] ShowImage => Image?.Content;
 
     public override void OnCreated()
     {

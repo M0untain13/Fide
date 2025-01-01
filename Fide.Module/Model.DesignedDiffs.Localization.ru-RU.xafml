@@ -15,9 +15,16 @@
     </Class>
     <Class Name="Fide.Module.BusinessObjects.ImageAnalysis" Caption="Анализ изображения">
       <OwnMembers>
-        <Member Name="Image" Caption="Изображение" />
+        <Member Name="Image" Caption="Прикрепить изображение" />
+        <Member Name="IsShared" Caption="Опубликовать" />
         <Member Name="Owner" Caption="Владелец" />
         <Member Name="Results" Caption="Результаты анализа" />
+        <Member Name="ShowImage" Caption="Изображение" />
+      </OwnMembers>
+    </Class>
+    <Class Name="Fide.Module.NonPersistentObjects.SelectAnalysisType">
+      <OwnMembers>
+        <Member Name="AnalysisType" Caption="Тип анализа" />
       </OwnMembers>
     </Class>
     <Class Name="Fide.Module.NonPersistentObjects.SelectImageForAnalysis" Caption="Анализировать">
@@ -52,6 +59,16 @@
     </Rules>
   </Validation>
   <Views>
+    <DetailView Id="ImageAnalysis_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="MainContent">
+            <LayoutGroup Id="ImageData" Caption="Изображение" />
+            <LayoutGroup Id="Info" Caption="Информация" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
     <ListView Id="ImageAnalysis_ListView_MyImages" Caption="Мои изображения">
       <Filters>
         <Filter Id="MyImages" Caption="Мои изображения" />
