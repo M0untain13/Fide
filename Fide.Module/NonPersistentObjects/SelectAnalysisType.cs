@@ -1,6 +1,5 @@
 ﻿using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.DC;
-using DevExpress.Persistent.Base;
 using Fide.Module.Enums;
 using System.ComponentModel;
 

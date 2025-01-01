@@ -20,9 +20,7 @@ namespace Fide.Module.NonPersistentObjects
 
         [Browsable(false)]
         public IObjectSpace ObjectSpace { get; set; }
-
         public ImageAnalysis SelectedImage { get; set; }
-
         public IList<SelectAnalysisType> SelectedAnalysisTypes { get; set; } = [];
 
         #region IXafEntityObject members (see https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.IXafEntityObject)

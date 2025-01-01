@@ -3,6 +3,9 @@
   <BOModel>
     <Class Name="DevExpress.Persistent.BaseImpl.EF.PermissionPolicy.PermissionPolicyUser" Caption="Base User" />
     <Class Name="Fide.Module.BusinessObjects.AnalysisResult" DefaultDetailViewImage="Actions_Zoom" ImageName="Actions_Zoom">
+      <AppearanceRules>
+        <AppearanceRule Id="HideFilesIfEmpty" Visibility="Hide" TargetItems="Files" Criteria="[Files][].Count() = 0" IsNewNode="True" />
+      </AppearanceRules>
       <OwnMembers>
         <Member Name="AnalysisType" AllowEdit="False" />
         <Member Name="Files" AllowEdit="False" />
@@ -18,6 +21,7 @@
       <AppearanceRules>
         <AppearanceRule Id="DisableFieldsIfNotMyImage" TargetItems="*" Enabled="False" Criteria="[Owner.ID] &lt;&gt; CURRENTUSERID()" IsNewNode="True" />
         <AppearanceRule Id="DisableImageUploadingWhenAlreadyUpload" Enabled="False" TargetItems="Image" Criteria="[Image] Is Not Null" IsNewNode="True" />
+        <AppearanceRule Id="HideResultsIfEmpty" Visibility="Hide" TargetItems="Results" Criteria="[Results][].Count() = 0" IsNewNode="True" />
       </AppearanceRules>
       <OwnMembers>
         <Member Name="Owner" AllowEdit="False" />
@@ -51,6 +55,32 @@
     </Rules>
   </Validation>
   <Views>
+    <DetailView Id="AnalysisResult_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main" Direction="Horizontal">
+          <LayoutGroup Id="ContentGroup" Index="0" ShowCaption="True" IsNewNode="True">
+            <LayoutItem Id="AnalysisType" ViewItem="AnalysisType" ShowCaption="False" Index="0" IsNewNode="True" />
+            <LayoutItem Id="Information" ViewItem="Information" ShowCaption="False" Index="1" IsNewNode="True" />
+            <LayoutItem Id="CreationDate" ViewItem="CreationDate" ShowCaption="False" Index="2" IsNewNode="True" />
+          </LayoutGroup>
+          <LayoutGroup Id="FilesGroup" Index="1" ShowCaption="True" IsNewNode="True">
+            <LayoutItem Id="Files" ViewItem="Files" ShowCaption="" Index="0" IsNewNode="True" />
+          </LayoutGroup>
+          <LayoutGroup Id="Files_Group" Removed="True">
+            <LayoutItem Id="Files" Removed="True" />
+          </LayoutGroup>
+          <LayoutGroup Id="SimpleEditors" Removed="True">
+            <LayoutGroup Id="AnalysisResult">
+              <LayoutItem Id="AnalysisType" Removed="True" />
+              <LayoutItem Id="Information" Removed="True" />
+            </LayoutGroup>
+            <LayoutGroup Id="FideBaseObject">
+              <LayoutItem Id="CreationDate" Removed="True" />
+            </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
     <ListView Id="ApplicationUser_ListView" Caption="Users" />
     <DetailView Id="ImageAnalysis_DetailView">
       <Layout>

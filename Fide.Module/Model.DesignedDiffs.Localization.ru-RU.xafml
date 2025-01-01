@@ -59,6 +59,13 @@
     </Rules>
   </Validation>
   <Views>
+    <DetailView Id="AnalysisResult_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="ContentGroup" Caption="Информация" />
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
     <DetailView Id="ImageAnalysis_DetailView">
       <Layout>
         <LayoutGroup Id="Main">
