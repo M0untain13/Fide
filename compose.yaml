@@ -1,14 +1,17 @@
 services:
   postgres:
-    container_name: postgres
-    image: postgres:latest
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PW}
-      - POSTGRES_DB=${POSTGRES_DB}
-    ports:
-      - "5432:5432"
-    restart: always
+    container_name: ${POSTGRES_HOST}
+    image: postgres:15-alpine
+    env_file:
+      - .env
+    command:
+      - 'postgres'
+      - '-c'
+      - 'port=${POSTGRES_PORT}'
+    volumes:
+      - db_vol:/var/lib/postgresql/data
+    networks:
+      - server_net
 
   pgadmin:
     container_name: pgadmin
@@ -23,7 +26,31 @@ services:
   blazor:
     container_name: blazor
     build:
-      context: ./Fide.Blazor.Server
+      context: ./Fide
     ports:
-      - "5001:5001"
+      - "5001:80"
     restart: always
+  
+  nginx:
+    container_name: ${NGINX_HOST}
+    build: ./Nginx
+    restart: on-failure
+    ports:
+      - ${NGINX_PORT}:${NGINX_PORT}
+    depends_on:
+      - react_app
+      - users_service
+      - requests_service
+      - products_service
+      - database_service
+    env_file:
+      - .env
+    networks:
+      - server_net
+
+volumes:
+  db_vol: {}
+
+networks:
+  server_net:
+    driver: bridge

@@ -1,0 +1,9 @@
+server {
+    server_name ${NGINX_HOST};
+    listen ${NGINX_PORT};
+
+    location /services/products/ {
+        proxy_pass http://${PRODUCTS_SERVICE_HOST}:${PRODUCTS_SERVICE_PORT};
+        rewrite ^/services/products/(.*) /$1 break;
+    }
+}

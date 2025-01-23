@@ -51,6 +51,7 @@ public class Program : IDesignTimeApplicationFactory
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<Startup>();
+                webBuilder.UseUrls("http://[::]:80");
             });
     XafApplication IDesignTimeApplicationFactory.Create()
     {

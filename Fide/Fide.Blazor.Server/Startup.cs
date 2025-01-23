@@ -52,19 +52,25 @@ public class Startup
                 .AddSecuredEFCore(options => options.PreFetchReferenceProperties())
                     .WithDbContext<FideEFCoreDbContext>((serviceProvider, options) =>
                     {
-                        var connectionString = Configuration.GetConnectionString("database");
                         var logger = serviceProvider.GetService<ILogger>();
 
-                        if (connectionString is null)
+                        var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+                        if(connectionString is not null)
                         {
-                            logger?.LogError("Строка подключения пустая.");
-                            options.UseInMemoryDatabase("InMemory");
+                            logger?.LogInformation("Строка подключения получена из окружения.");
                         }
                         else
                         {
-                            logger?.LogInformation($"Строка подключения: '{connectionString}'.");
-                            options.UseNpgsql(connectionString);
+                            connectionString = Configuration.GetConnectionString("database");
+                            if (connectionString is not null)
+                            {
+                                logger?.LogInformation("Строка подключения получена из конфигурации.");
+                            }
                         }
+
+                        ArgumentNullException.ThrowIfNull(connectionString);
+                        logger?.LogInformation("Строка подключения: {connectionString}.", connectionString);
+                        options.UseNpgsql(connectionString);
 
                         options.UseChangeTrackingProxies();
                         options.UseObjectSpaceLinkProxies();
