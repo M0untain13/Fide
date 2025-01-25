@@ -54,9 +54,16 @@ public class Startup
                     {
                         var logger = serviceProvider.GetService<ILogger>();
 
-                        var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
-                        if(connectionString is not null)
+                        var postgresDb = Environment.GetEnvironmentVariable("POSTGRES_DB");
+                        var postgresUser = Environment.GetEnvironmentVariable("POSTGRES_USER");
+                        var postgresPassword = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
+                        string connectionString = null;
+
+                        if(postgresDb is not null 
+                            && postgresUser is not null 
+                            && postgresPassword is not null)
                         {
+                            connectionString = $"Host=postgres;Port=5432;Database={postgresDb};Username={postgresUser};Password={postgresPassword}";
                             logger?.LogInformation("Строка подключения получена из окружения.");
                         }
                         else
@@ -68,9 +75,16 @@ public class Startup
                             }
                         }
 
-                        ArgumentNullException.ThrowIfNull(connectionString);
-                        logger?.LogInformation("Строка подключения: {connectionString}.", connectionString);
-                        options.UseNpgsql(connectionString);
+                        if(connectionString is null)
+                        {
+                            logger?.LogError("Отсутствует строка подключения, БД запускается в оперативной памяти.")
+                            // TODO: написать InMemory 
+                        }
+                        else
+                        {
+                            logger?.LogInformation("Строка подключения: {connectionString}.", connectionString);
+                            options.UseNpgsql(connectionString);
+                        }
 
                         options.UseChangeTrackingProxies();
                         options.UseObjectSpaceLinkProxies();

@@ -23,21 +23,24 @@ public class Updater(IObjectSpace objectSpace, Version currentDBVersion)
 
         ObjectSpace.CommitChanges();
 
-        AddAdmin(adminRole);
 #if DEBUG
+        AddAdmin(adminRole);
         AddDefaultUserForDebug(defaultRole);
 #endif
+#if RELEASE
+        AddAdmin(adminRole, "P@ssw0rd");
+#endif
+
         ObjectSpace.CommitChanges();
     }
 
-    private void AddAdmin(PermissionPolicyRole adminRole)
+    private void AddAdmin(PermissionPolicyRole adminRole, string password = "")
     {
         UserManager userManager = ObjectSpace.ServiceProvider.GetRequiredService<UserManager>();
 
         if (userManager.FindUserByName<ApplicationUser>(ObjectSpace, "Admin") == null)
         {
-            string EmptyPassword = "";
-            _ = userManager.CreateUser<ApplicationUser>(ObjectSpace, "Admin", EmptyPassword, (user) =>
+            _ = userManager.CreateUser<ApplicationUser>(ObjectSpace, "Admin", password, (user) =>
             {
                 user.Roles.Add(adminRole);
             });
