@@ -2,6 +2,7 @@
 using DevExpress.ExpressApp.Blazor.ApplicationBuilder;
 using DevExpress.ExpressApp.Blazor.Services;
 using DevExpress.ExpressApp.Security;
+using DevExpress.Persistent.Base;
 using DevExpress.Persistent.BaseImpl.EF.PermissionPolicy;
 using Fide.Blazor.Server.Services;
 using Fide.Module.BusinessObjects.Context;
@@ -52,8 +53,6 @@ public class Startup
                 .AddSecuredEFCore(options => options.PreFetchReferenceProperties())
                     .WithDbContext<FideEFCoreDbContext>((serviceProvider, options) =>
                     {
-                        var logger = serviceProvider.GetService<ILogger>();
-
                         var postgresDb = Environment.GetEnvironmentVariable("POSTGRES_DB");
                         var postgresUser = Environment.GetEnvironmentVariable("POSTGRES_USER");
                         var postgresPassword = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
@@ -64,25 +63,25 @@ public class Startup
                             && postgresPassword is not null)
                         {
                             connectionString = $"Host=postgres;Port=5432;Database={postgresDb};Username={postgresUser};Password={postgresPassword}";
-                            logger?.LogInformation("Строка подключения получена из окружения.");
+                            Tracing.Tracer.LogText("Строка подключения получена из окружения.");
                         }
                         else
                         {
                             connectionString = Configuration.GetConnectionString("database");
                             if (connectionString is not null)
                             {
-                                logger?.LogInformation("Строка подключения получена из конфигурации.");
+                                Tracing.Tracer.LogText("Строка подключения получена из конфигурации.");
                             }
                         }
 
                         if(connectionString is null)
                         {
-                            logger?.LogError("Отсутствует строка подключения, БД запускается в оперативной памяти.")
-                            // TODO: написать InMemory 
+                            Tracing.Tracer.LogError("Отсутствует строка подключения, БД запускается в оперативной памяти.");
+                            options.UseInMemoryDatabase("InMemory");
                         }
                         else
                         {
-                            logger?.LogInformation("Строка подключения: {connectionString}.", connectionString);
+                            Tracing.Tracer.LogText($"Строка подключения: {connectionString}.");
                             options.UseNpgsql(connectionString);
                         }
 
