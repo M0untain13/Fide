@@ -1,0 +1,19 @@
+services:
+  fide:
+    build: ./Fide
+    env_file: "./.env"
+    networks:
+     - local_net
+    ports:
+     - "8080:80"
+  aomaca:
+    container_name: ${AOMACA_HOST}
+    build: ./Aomaca
+    networks:
+    - local_net
+    ports:
+    - "8090:80"
+
+networks:
+  local_net:
+    driver: bridge
