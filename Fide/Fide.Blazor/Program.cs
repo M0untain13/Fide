@@ -13,6 +13,13 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        var app = Build(args);
+        Configure(app);
+        app.Run();
+    }
+
+    private static WebApplication Build(string[] args)
+    {
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services
@@ -33,14 +40,21 @@ public class Program
             })
             .AddIdentityCookies();
 
-        var connectionString = builder.Configuration
-            .GetConnectionString("DefaultConnection") 
-            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+#if DEBUG
+        var connectionString = @"Server=(localdb)\\mssqllocaldb;Database=aspnet-Fide.Blazor-74127606-726e-4155-8f12-ae484fd1d53e;Trusted_Connection=True;MultipleActiveResultSets=true";
+#else
+        var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") 
+            ?? throw new NullReferenceException("CONNECTION_STRING variable is missing");
+#endif
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString)
         );
-        builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+        }
 
         builder.Services
             .AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -50,11 +64,20 @@ public class Program
 
         builder.Services
             .AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>()
-            .AddSingleton<IAnalysisProxy, AnalysisProxyStub>()
+            .AddSingleton<IAnalysisProxy, AnalysisProxyStub>(provider =>
+            {
+                var aomacaHost = Environment.GetEnvironmentVariable("AOMACA_HOST");
+                return new AnalysisProxyStub($"http://{aomacaHost}");
+            })
             .AddSingleton<IS3Proxy, S3ProxyStub>();
 
-        var app = builder.Build();
+        builder.WebHost.UseUrls("http://[::]:80");
 
+        return builder.Build();
+    }
+
+    private static void Configure(WebApplication app)
+    {
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
@@ -77,7 +100,5 @@ public class Program
 
         // Add additional endpoints required by the Identity /Account Razor components.
         app.MapAdditionalIdentityEndpoints();
-
-        app.Run();
     }
 }
