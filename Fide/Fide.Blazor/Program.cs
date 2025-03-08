@@ -23,6 +23,19 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+#if RELEASE
+        ConfigureBuilderRelease(builder);
+#else
+        ConfigureBuilderDebug(builder);
+#endif
+
+        return builder.Build();
+    }
+
+    private static void ConfigureBuilderDebug(WebApplicationBuilder builder)
+    {
+        Console.WriteLine("Используется DEBUG сборка");
+
         builder.Services
             .AddRazorComponents()
             .AddInteractiveServerComponents();
@@ -41,21 +54,55 @@ public class Program
             })
             .AddIdentityCookies();
 
-#if DEBUG
         var connectionString = @"Server=(localdb)\\mssqllocaldb;Database=aspnet-Fide.Blazor-74127606-726e-4155-8f12-ae484fd1d53e;Trusted_Connection=True;MultipleActiveResultSets=true";
-#else
-        var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") 
-            ?? throw new NullReferenceException("CONNECTION_STRING variable is missing");
-#endif
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString)
         );
 
-        if (builder.Environment.IsDevelopment())
-        {
-            builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-        }
+        builder.Services
+            .AddDatabaseDeveloperPageExceptionFilter();
+
+        builder.Services
+            .AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddSignInManager()
+            .AddDefaultTokenProviders();
+
+        builder.Services
+            .AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>()
+            .AddSingleton<IAnalysisProxy, AnalysisProxyStub>()
+            .AddSingleton<IS3Proxy, S3ProxyStub>();
+    }
+
+    private static void ConfigureBuilderRelease(WebApplicationBuilder builder)
+    {
+        Console.WriteLine("Используется RELEASE сборка");
+
+        builder.Services
+            .AddRazorComponents()
+            .AddInteractiveServerComponents();
+
+        builder.Services
+            .AddCascadingAuthenticationState()
+            .AddScoped<IdentityUserAccessor>()
+            .AddScoped<IdentityRedirectManager>()
+            .AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+
+        builder.Services
+            .AddAuthentication(options =>
+            {
+                options.DefaultScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+            })
+            .AddIdentityCookies();
+
+        var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING")
+            ?? throw new NullReferenceException("CONNECTION_STRING variable is missing");
+
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(connectionString)
+        );
 
         builder.Services
             .AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -88,8 +135,6 @@ public class Program
             .AddSingleton<IS3Proxy, MinioProxy>();
 
         builder.WebHost.UseUrls("http://[::]:80");
-
-        return builder.Build();
     }
 
     private static void Configure(WebApplication app)
