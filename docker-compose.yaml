@@ -4,9 +4,21 @@ services:
     build: ./Fide
     env_file: "./.env"
     networks:
-     - local_net
+    - local_net
     ports:
-     - "8080:80"
+    - "8080:80"
+    depends_on:
+    - database
+    - aomaca
+    - minio
+  database:
+    container_name: ${DATABASE_HOST}
+    image: mcr.microsoft.com/mssql/server:2022-CU17-ubuntu-22.04
+    env_file: "./.env"
+    environment:
+      - ACCEPT_EULA=Y
+    networks:
+    - local_net
   aomaca:
     container_name: ${AOMACA_HOST}
     build: ./Aomaca
@@ -15,12 +27,16 @@ services:
     - local_net
     ports:
     - "8090:80"
+    depends_on:
+    - minio
   minio:
     container_name: ${MINIO_HOST}
     image: bitnami/minio:2024.7.26
     env_file: "./.env"
     volumes:
       - minio_volume:/bitnami/minio/data
+    networks:
+    - local_net
     ports:
     - "8100:9000"
     - "8101:9001"
@@ -31,3 +47,4 @@ networks:
 
 volumes:
   minio_volume: {}
+  database_volume: {}
