@@ -21,11 +21,17 @@ def analysis():
     image_for_analysis_path = f'Files/{uuid.uuid4()}'
     image_ela_path = f'Files/{uuid.uuid4()}'
 
-    get_image(data['bucketName'], data['objectName'], image_for_analysis_path)
-    get_ela(image_for_analysis_path, image_ela_path)
-    upload_image(data['bucketName'], f'ela_{data['objectName']}', image_ela_path)
+    image_for_analysis_bucket = data['bucketName']
+    image_ela_bucket = "aomaca"
 
-    response = [predict_result(image_for_analysis_path), data['bucketName'], f'ela_{data['objectName']}']
+    object_name_for_analysis = data['objectName']
+    object_name_ela = f'ela_{object_name_for_analysis}'
+
+    get_image(image_for_analysis_bucket, object_name_for_analysis, image_for_analysis_path)
+    get_ela(image_for_analysis_path, image_ela_path)
+    upload_image(image_ela_bucket, object_name_ela, image_ela_path)
+
+    response = [predict_result(image_for_analysis_path), image_ela_bucket, object_name_ela]
     os.remove(image_for_analysis_path)
     os.remove(image_ela_path)
 

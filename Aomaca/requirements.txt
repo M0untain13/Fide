@@ -1,5 +1,4 @@
 flask==3.1.0
-minio==0.0.0
-PIL==0.0.0
-numpy==0.0.0
-keras==0.0.0
+minio==7.2.15
+Pillow==11.1.0
+tensorflow==2.18.0

@@ -10,6 +10,7 @@ services:
   aomaca:
     container_name: ${AOMACA_HOST}
     build: ./Aomaca
+    env_file: "./.env"
     networks:
     - local_net
     ports:
