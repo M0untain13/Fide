@@ -4,5 +4,5 @@ namespace Fide.Blazor.Services.AnalysisProxy;
 
 public interface IAnalysisProxy
 {
-    AnalysisResponse Send(AnalysisRequest request);
+    Task<AnalysisResponse> SendAsync(AnalysisRequest request);
 }

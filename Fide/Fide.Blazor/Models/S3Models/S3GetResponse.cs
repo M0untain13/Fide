@@ -1,5 +1,5 @@
 ﻿namespace Fide.Blazor.Models.S3Models;
 
-public class S3Response
+public class S3GetResponse
 {
 }

@@ -4,5 +4,6 @@ namespace Fide.Blazor.Services.S3Proxy;
 
 public interface IS3Proxy
 {
-    S3Response Send(S3Request request);
+    Task<S3UploadResponse> UploadAsync(S3UploadRequest request);
+    Task<S3GetResponse> GetAsync(S3GetRequest request);
 }

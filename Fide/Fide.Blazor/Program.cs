@@ -6,6 +6,7 @@ using Fide.Blazor.Services.S3Proxy;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Minio;
 
 namespace Fide.Blazor;
 
@@ -64,10 +65,25 @@ public class Program
 
         builder.Services
             .AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>()
-            .AddSingleton<IAnalysisProxy, AnalysisProxyStub>(provider =>
+            .AddMinio(configureClient =>
+            {
+                var minioHost = Environment.GetEnvironmentVariable("MINIO_HOST");
+                var accessKey = Environment.GetEnvironmentVariable("MINIO_ACCESS");
+                var secretKey = Environment.GetEnvironmentVariable("MINIO_SECRET");
+                configureClient
+                    .WithEndpoint(minioHost)
+                    .WithCredentials(accessKey, secretKey)
+                    .Build();
+            })
+            .AddSingleton<IAnalysisProxy>(provider =>
             {
                 var aomacaHost = Environment.GetEnvironmentVariable("AOMACA_HOST");
-                return new AnalysisProxyStub($"http://{aomacaHost}");
+                var httpClient = new HttpClient
+                {
+                    BaseAddress = new Uri($"http://{aomacaHost}")
+                };
+                var logger = provider.GetRequiredService<ILogger<AomacaProxy>>();
+                return new AomacaProxy(httpClient, logger);
             })
             .AddSingleton<IS3Proxy, S3ProxyStub>();
 

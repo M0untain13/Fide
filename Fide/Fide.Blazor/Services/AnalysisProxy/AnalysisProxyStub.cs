@@ -1,19 +1,14 @@
 ﻿using Fide.Blazor.Models.AnalysisModels;
 
-namespace Fide.Blazor.Services.AnalysisProxy
+namespace Fide.Blazor.Services.AnalysisProxy;
+
+public class AnalysisProxyStub : IAnalysisProxy
 {
-    public class AnalysisProxyStub : IAnalysisProxy
+    public Task<AnalysisResponse> SendAsync(AnalysisRequest request)
     {
-        private readonly string _baseUrl;
-
-        public AnalysisProxyStub(string baseUrl)
-        {
-            _baseUrl = baseUrl;
-        }
-
-        public AnalysisResponse Send(AnalysisRequest request)
+        return Task.Run(() =>
         {
             return new AnalysisResponse();
-        }
+        });
     }
 }
