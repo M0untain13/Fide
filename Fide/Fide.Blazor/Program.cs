@@ -68,8 +68,8 @@ public class Program
             .AddMinio(configureClient =>
             {
                 var minioHost = Environment.GetEnvironmentVariable("MINIO_HOST");
-                var accessKey = Environment.GetEnvironmentVariable("MINIO_ACCESS");
-                var secretKey = Environment.GetEnvironmentVariable("MINIO_SECRET");
+                var accessKey = Environment.GetEnvironmentVariable("MINIO_ROOT_USER");
+                var secretKey = Environment.GetEnvironmentVariable("MINIO_ROOT_PASSWORD");
                 configureClient
                     .WithEndpoint(minioHost)
                     .WithCredentials(accessKey, secretKey)
@@ -85,7 +85,7 @@ public class Program
                 var logger = provider.GetRequiredService<ILogger<AomacaProxy>>();
                 return new AomacaProxy(httpClient, logger);
             })
-            .AddSingleton<IS3Proxy, S3ProxyStub>();
+            .AddSingleton<IS3Proxy, MinioProxy>();
 
         builder.WebHost.UseUrls("http://[::]:80");
 

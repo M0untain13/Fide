@@ -1,5 +1,6 @@
 services:
   fide:
+    container_name: ${FIDE_HOST}
     build: ./Fide
     env_file: "./.env"
     networks:
@@ -13,7 +14,19 @@ services:
     - local_net
     ports:
     - "8090:80"
+  minio:
+    container_name: ${MINIO_HOST}
+    image: bitnami/minio:2024.7.26
+    env_file: "./.env"
+    volumes:
+      - minio_volume:/bitnami/minio/data
+    ports:
+    - "8100:9000"
+    - "8101:9001"
 
 networks:
   local_net:
     driver: bridge
+
+volumes:
+  minio_volume: {}
