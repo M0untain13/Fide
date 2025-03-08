@@ -4,6 +4,8 @@ from ela import get_ela
 from cnn import predict_result
 import uuid
 import os
+from waitress import serve
+    
 
 app = Flask(__name__)
 os.makedirs('Files', exist_ok=True)
@@ -39,4 +41,4 @@ def analysis():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80)
+    serve(app, host="0.0.0.0", port=8080)

@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 from keras.models import load_model
 
-model = load_model("trained_model.h5")
+model = load_model("trained_model.keras")
 
 
 def PrepareImage(path: str) -> np.ndarray:
