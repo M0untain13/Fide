@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace Fide.Blazor.Services.EmailSender;
 
-public class SmtpEmailSender(string host, string email, string password) : IEmailSender
+public class SmtpEmailSender(string host, int port, string email, string password) : IEmailSender
 {
     public Task SendEmailAsync(string recipientEmail, string subject, string message)
     {
         using var client = new SmtpClient(host)
         {
-            Port = 587,
+            Port = port,
             Credentials = new NetworkCredential(email, password),
             EnableSsl = true,
         };

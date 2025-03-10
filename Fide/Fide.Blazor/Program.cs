@@ -82,6 +82,7 @@ public class Program
 
         var connectionString = GetRequiredEnvironmentVariable("CONNECTION_STRING");
         var smtpHost = GetRequiredEnvironmentVariable("SMTP_HOST");
+        var smtpPort = Convert.ToInt32(GetRequiredEnvironmentVariable("SMTP_PORT"));
         var smtpEmail = GetRequiredEnvironmentVariable("SMTP_EMAIL");
         var smtpPassword = GetRequiredEnvironmentVariable("SMTP_PASSWORD");
         var minioHost = GetRequiredEnvironmentVariable("MINIO_HOST");
@@ -122,7 +123,7 @@ public class Program
             .AddSingleton<IEmailSender<ApplicationUser>, ApplicationUserEmailSender>()
             .AddSingleton<IEmailSender>(provider =>
             {
-                return new SmtpEmailSender(smtpHost, smtpEmail, smtpPassword);
+                return new SmtpEmailSender(smtpHost, smtpPort, smtpEmail, smtpPassword);
             })
             .AddMinio(configureClient =>
             {
