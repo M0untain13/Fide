@@ -1,4 +1,6 @@
-﻿@if (!string.IsNullOrEmpty(DisplayMessage))
+﻿@using Fide.Blazor.Services
+
+@if (!string.IsNullOrEmpty(DisplayMessage))
 {
     var statusMessageClass = DisplayMessage.StartsWith("Ошибка") ? "danger" : "success";
     <div class="alert alert-@statusMessageClass" role="alert">

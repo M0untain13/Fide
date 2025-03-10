@@ -73,7 +73,8 @@ public class Program
         builder.Services
             .AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>()
             .AddSingleton<IAnalysisProxy, AnalysisProxyStub>()
-            .AddSingleton<IS3Proxy, S3ProxyStub>();
+            .AddSingleton<IS3Proxy, S3ProxyStub>()
+            .AddSingleton(_ => new FideEnvironment(isDebug: true));
     }
 
     private static void ConfigureBuilderRelease(WebApplicationBuilder builder)
@@ -141,7 +142,8 @@ public class Program
                 var logger = provider.GetRequiredService<ILogger<AomacaProxy>>();
                 return new AomacaProxy(httpClient, logger);
             })
-            .AddSingleton<IS3Proxy, MinioProxy>();
+            .AddSingleton<IS3Proxy, MinioProxy>()
+            .AddSingleton(_ => new FideEnvironment(isDebug: false));
 
         builder.WebHost.UseUrls("http://[::]:80");
     }
