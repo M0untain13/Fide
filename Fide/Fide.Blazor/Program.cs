@@ -54,10 +54,8 @@ public class Program
             })
             .AddIdentityCookies();
 
-        var connectionString = @"Server=(localdb)\\mssqllocaldb;Database=aspnet-Fide.Blazor-74127606-726e-4155-8f12-ae484fd1d53e;Trusted_Connection=True;MultipleActiveResultSets=true";
-
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString)
+            options.UseInMemoryDatabase("Fide")
         );
 
         builder.Services
