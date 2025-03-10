@@ -1,10 +1,13 @@
 using Fide.Blazor.Components;
-using Fide.Blazor.Components.Account;
 using Fide.Blazor.Data;
+using Fide.Blazor.Extensions;
+using Fide.Blazor.Services;
 using Fide.Blazor.Services.AnalysisProxy;
+using Fide.Blazor.Services.EmailSender;
 using Fide.Blazor.Services.S3Proxy;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Minio;
 
@@ -77,6 +80,15 @@ public class Program
     {
         Console.WriteLine("Используется RELEASE сборка");
 
+        var connectionString = GetRequiredEnvironmentVariable("CONNECTION_STRING");
+        var smtpHost = GetRequiredEnvironmentVariable("SMTP_HOST");
+        var smtpEmail = GetRequiredEnvironmentVariable("SMTP_EMAIL");
+        var smtpPassword = GetRequiredEnvironmentVariable("SMTP_PASSWORD");
+        var minioHost = GetRequiredEnvironmentVariable("MINIO_HOST");
+        var minioUser = GetRequiredEnvironmentVariable("MINIO_ROOT_USER");
+        var minioPassword = GetRequiredEnvironmentVariable("MINIO_ROOT_PASSWORD");
+        var aomacaHost = GetRequiredEnvironmentVariable("AOMACA_HOST");
+
         builder.Services
             .AddRazorComponents()
             .AddInteractiveServerComponents();
@@ -95,8 +107,6 @@ public class Program
             })
             .AddIdentityCookies();
 
-        var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING")
-            ?? throw new NullReferenceException("CONNECTION_STRING variable is missing");
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString)
@@ -109,20 +119,20 @@ public class Program
             .AddDefaultTokenProviders();
 
         builder.Services
-            .AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>()
+            .AddSingleton<IEmailSender<ApplicationUser>, ApplicationUserEmailSender>()
+            .AddSingleton<IEmailSender>(provider =>
+            {
+                return new SmtpEmailSender(smtpHost, smtpEmail, smtpPassword);
+            })
             .AddMinio(configureClient =>
             {
-                var minioHost = Environment.GetEnvironmentVariable("MINIO_HOST");
-                var accessKey = Environment.GetEnvironmentVariable("MINIO_ROOT_USER");
-                var secretKey = Environment.GetEnvironmentVariable("MINIO_ROOT_PASSWORD");
                 configureClient
                     .WithEndpoint(minioHost)
-                    .WithCredentials(accessKey, secretKey)
+                    .WithCredentials(minioUser, minioPassword)
                     .Build();
             })
             .AddSingleton<IAnalysisProxy>(provider =>
             {
-                var aomacaHost = Environment.GetEnvironmentVariable("AOMACA_HOST");
                 var httpClient = new HttpClient
                 {
                     BaseAddress = new Uri($"http://{aomacaHost}")
@@ -137,7 +147,6 @@ public class Program
 
     private static void Configure(WebApplication app)
     {
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseMigrationsEndPoint();
@@ -145,7 +154,6 @@ public class Program
         else
         {
             app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
 
@@ -157,7 +165,10 @@ public class Program
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode();
 
-        // Add additional endpoints required by the Identity /Account Razor components.
         app.MapAdditionalIdentityEndpoints();
     }
+
+    private static string GetRequiredEnvironmentVariable(string name)
+        => Environment.GetEnvironmentVariable(name) 
+            ?? throw new NullReferenceException($"{name} is missing");
 }
