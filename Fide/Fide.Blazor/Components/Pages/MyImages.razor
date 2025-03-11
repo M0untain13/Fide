@@ -1,9 +1,56 @@
 ﻿@page "/myimages"
 
 @using Microsoft.AspNetCore.Authorization
+@using Fide.Blazor.Services.ImageLoader
+@using Fide.Blazor.Models.ImageLoaderModels
+@using System.Collections.Generic;
 
+@inject AuthenticationState context
+@inject IImageLoader ImageLoader
 @attribute [Authorize]
 
 <PageTitle>Мои изображения</PageTitle>
 
-Текст тест
+@if (Images is null)
+{
+    <p>Загрузка...</p>
+}
+else
+{
+    if(Images.Count == 0)
+    {
+        <p>Пусто :(</p>
+    }
+    else
+    {
+        foreach (var image in Images)
+        {
+            <p>@image.Length</p>
+        }
+    }
+}
+
+<InputFile OnChange="LoadFiles" multiple />
+
+@code {
+    private List<byte[]>? Images;
+
+    private void LoadFiles(InputFileChangeEventArgs e)
+    {
+        var files = e.GetMultipleFiles();
+        var request = new ImageUploadRequest()
+        {
+            //Files = files
+        };
+        ImageLoader.Upload(request);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var request = new ImageDownloadRequest()
+        {
+            //User = context.User.Identity.Name
+        };
+        ImageLoader.Download(request);
+    }
+}
