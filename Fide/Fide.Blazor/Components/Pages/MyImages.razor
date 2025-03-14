@@ -5,7 +5,7 @@
 @using Fide.Blazor.Models.ImageLoaderModels
 @using System.Collections.Generic;
 
-@inject AuthenticationState context
+@inject AuthenticationStateProvider ContextProvider
 @inject IImageLoader ImageLoader
 @attribute [Authorize]
 
@@ -35,36 +35,51 @@ else
 @code {
     private List<byte[]>? Images;
 
+    private int TakedImagesCount;
+
     private void LoadFiles(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles();
+
+        var fileStreams = new List<Stream>();
+
+        foreach(var file in files)
+        {
+            fileStreams.Add(file.OpenReadStream());
+        }
+
         var request = new ImageUploadRequest()
         {
-            //Files = files
+            FileStreams = fileStreams,
         };
         var response = ImageLoader.Upload(request);
-        /*
-        // Указать, были изображение успешно загружено
-        */
+
+        // TODO: Указать, были изображение успешно загружено
     }
 
     protected override async Task OnInitializedAsync()
     {
-        var request = new ImageDownloadRequest()
-        {
-            //User = context.User.Identity.Name,
-            //Take = 10,
-        };
-        var response = ImageLoader.Download(request);
-        /*
-        foreach (var stream in response.Streams)
-        {
-            // Загрузить из потока изображение в ОЗУ
-            // Добавить изображение в Images
-        }
-
-        */
+        await LoadImages();
     }
 
-    // Добавить кнопку "Загрузить еще", которая будет делать Skip += 10 при запросе изображений
+    private async Task LoadImages()
+    {
+        var context = await ContextProvider.GetAuthenticationStateAsync();
+        var request = new ImageDownloadRequest()
+        {
+            UserName = context.User.Identity.Name,
+            Skip = TakedImagesCount,
+            Take = 10,
+        };
+        TakedImagesCount += 10;
+        var response = ImageLoader.Download(request);
+        Images = new();
+        foreach (var stream in response.FileStreams)
+        {
+            // TODO: Загрузить из потока изображение в ОЗУ
+            // TODO: Добавить изображение в Images
+        }
+    }
+
+    // TODO: Добавить кнопку "Загрузить еще", которая будет делать Skip += 10 при запросе изображений
 }

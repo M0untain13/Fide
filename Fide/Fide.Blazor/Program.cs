@@ -78,7 +78,7 @@ public class Program
             .AddSingleton<IAnalysisProxy, AnalysisProxyStub>()
             .AddSingleton<IS3Proxy, S3ProxyStub>()
             .AddSingleton(_ => new FideEnvironment(isDebug: true))
-            .AddSingleton<IImageLoader, ImageLoader>()
+            .AddScoped<IImageLoader, ImageLoader>()
             .AddTransient<IRepository<ImageLink>, ImageLinkRepository>()
             .AddTransient<IRepository<ApplicationUser, string>, UserRepository>();
     }
@@ -150,7 +150,7 @@ public class Program
             })
             .AddSingleton<IS3Proxy, MinioProxy>()
             .AddSingleton(_ => new FideEnvironment(isDebug: false))
-            .AddSingleton<IImageLoader, ImageLoader>()
+            .AddScoped<IImageLoader, ImageLoader>()
             .AddTransient<IRepository<ImageLink>, ImageLinkRepository>()
             .AddTransient<IRepository<ApplicationUser, string>, UserRepository>();
 

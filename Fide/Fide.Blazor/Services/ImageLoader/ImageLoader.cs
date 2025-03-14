@@ -11,7 +11,7 @@ public class ImageLoader(
     IS3Proxy s3proxy, 
     IRepository<ImageLink> imageRepository, 
     IRepository<ApplicationUser, string> userRepository,
-    AuthenticationState context
+    AuthenticationStateProvider contextProvider
 ) : IImageLoader
 {
     public ImageDeleteResponse Delete(ImageDeleteRequest request)
@@ -19,6 +19,7 @@ public class ImageLoader(
         // Проверить существование изображения
         // Удалить из S3
         // Удалить ссылку из БД
+        throw new NotImplementedException();
     }
 
     public ImageDownloadResponse Download(ImageDownloadRequest request)
@@ -58,6 +59,7 @@ public class ImageLoader(
                 Stream = stream,
             };
             var s3response = s3proxy.UploadAsync(s3request).Result;
+            var context = contextProvider.GetAuthenticationStateAsync().Result;
             var user = userRepository.Get(context.User.Identity.Name);
             var imageLink = new ImageLink()
             {
