@@ -4,6 +4,8 @@ using Fide.Blazor.Extensions;
 using Fide.Blazor.Services;
 using Fide.Blazor.Services.AnalysisProxy;
 using Fide.Blazor.Services.EmailSender;
+using Fide.Blazor.Services.Repositories;
+using Fide.Blazor.Services.Repositories.Base;
 using Fide.Blazor.Services.S3Proxy;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -74,7 +76,8 @@ public class Program
             .AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>()
             .AddSingleton<IAnalysisProxy, AnalysisProxyStub>()
             .AddSingleton<IS3Proxy, S3ProxyStub>()
-            .AddSingleton(_ => new FideEnvironment(isDebug: true));
+            .AddSingleton(_ => new FideEnvironment(isDebug: true))
+            .AddTransient<IRepository<ImageLink>, ImageLinkRepository>();
     }
 
     private static void ConfigureBuilderRelease(WebApplicationBuilder builder)
@@ -143,7 +146,8 @@ public class Program
                 return new AomacaProxy(httpClient, logger);
             })
             .AddSingleton<IS3Proxy, MinioProxy>()
-            .AddSingleton(_ => new FideEnvironment(isDebug: false));
+            .AddSingleton(_ => new FideEnvironment(isDebug: false))
+            .AddTransient<IRepository<ImageLink>, ImageLinkRepository>();
 
         builder.WebHost.UseUrls("http://[::]:80");
     }
