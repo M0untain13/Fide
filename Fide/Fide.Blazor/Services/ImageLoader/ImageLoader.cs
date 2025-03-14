@@ -11,7 +11,8 @@ public class ImageLoader(
     IS3Proxy s3proxy, 
     IRepository<ImageLink> imageRepository, 
     IRepository<ApplicationUser, string> userRepository,
-    AuthenticationState context) : IImageLoader
+    AuthenticationState context
+) : IImageLoader
 {
     public ImageDeleteResponse Delete(ImageDeleteRequest request)
     {
@@ -54,15 +55,14 @@ public class ImageLoader(
         {
             var s3request = new S3UploadRequest()
             {
-                ObjectName = Guid.NewGuid().ToString(),
                 Stream = stream,
             };
-            var _ = s3proxy.UploadAsync(s3request).Result;
+            var s3response = s3proxy.UploadAsync(s3request).Result;
             var user = userRepository.Get(context.User.Identity.Name);
             var imageLink = new ImageLink()
             {
                 User = user,
-                Url = s3request.ObjectName,
+                Url = s3response.ObjectName,
             };
             imageRepository.Create(imageLink);
             imageUrl.Add(imageLink.Url);

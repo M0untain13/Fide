@@ -27,14 +27,19 @@ public class MinioProxy(IMinioClient minioClient, ILogger<MinioProxy> logger, st
                 await CreateBucket().ConfigureAwait(false);
             }
 
+            var objectName = Guid.NewGuid().ToString();
+
             var putObjectArgs = new PutObjectArgs()
                 .WithBucket(bucketName)
-                .WithObject(request.ObjectName)
+                .WithObject(objectName)
                 .WithStreamData(request.Stream);
 
             await minioClient.PutObjectAsync(putObjectArgs).ConfigureAwait(false);
 
-            return new S3UploadResponse();
+            return new S3UploadResponse()
+            {
+                ObjectName = objectName,
+            };
         }
         catch (Exception ex)
         {

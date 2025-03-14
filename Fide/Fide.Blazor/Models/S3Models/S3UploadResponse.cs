@@ -2,4 +2,5 @@
 
 public class S3UploadResponse
 {
+    public string ObjectName;
 }
