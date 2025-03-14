@@ -7,7 +7,7 @@ public class UserRepository(ApplicationDbContext context) : IRepository<Applicat
 {
     public ApplicationUser Get(string id)
     {
-        return context.Users.First(u => u.Ema == id);
+        return context.Users.First(u => u.Email == id);
     }
 
     public IEnumerable<ApplicationUser> GetAll()
