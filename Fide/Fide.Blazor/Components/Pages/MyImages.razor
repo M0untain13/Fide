@@ -42,15 +42,29 @@ else
         {
             //Files = files
         };
-        ImageLoader.Upload(request);
+        var response = ImageLoader.Upload(request);
+        /*
+        // Указать, были изображение успешно загружено
+        */
     }
 
     protected override async Task OnInitializedAsync()
     {
         var request = new ImageDownloadRequest()
         {
-            //User = context.User.Identity.Name
+            //User = context.User.Identity.Name,
+            //Take = 10,
         };
-        ImageLoader.Download(request);
+        var response = ImageLoader.Download(request);
+        /*
+        foreach (var stream in response.Streams)
+        {
+            // Загрузить из потока изображение в ОЗУ
+            // Добавить изображение в Images
+        }
+
+        */
     }
+
+    // Добавить кнопку "Загрузить еще", которая будет делать Skip += 10 при запросе изображений
 }

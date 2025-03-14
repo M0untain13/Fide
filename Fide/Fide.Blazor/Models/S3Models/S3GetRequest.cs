@@ -3,5 +3,4 @@
 public class S3GetRequest
 {
     public string ObjectName;
-    public Stream Stream;
 }

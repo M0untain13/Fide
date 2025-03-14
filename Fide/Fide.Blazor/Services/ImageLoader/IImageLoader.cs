@@ -6,4 +6,5 @@ public interface IImageLoader
 {
     ImageDownloadResponse Download(ImageDownloadRequest request);
     ImageUploadResponse Upload(ImageUploadRequest request);
+    ImageDeleteResponse Delete(ImageDeleteRequest request);
 }

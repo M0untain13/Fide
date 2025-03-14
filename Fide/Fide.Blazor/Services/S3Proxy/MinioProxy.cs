@@ -45,13 +45,15 @@ public class MinioProxy(IMinioClient minioClient, ILogger<MinioProxy> logger, st
 
     public async Task<S3GetResponse> GetAsync(S3GetRequest request)
     {
+        var response = new S3GetResponse();
+
         var getArgs = new GetObjectArgs()
             .WithObject(request.ObjectName)
             .WithBucket(bucketName)
-            .WithCallbackStream(stream => request.Stream = stream);
+            .WithCallbackStream(stream => response.Stream = stream);
 
-        var objectStat = await minioClient.GetObjectAsync(getArgs);
+        var _ = await minioClient.GetObjectAsync(getArgs);
 
-        return new S3GetResponse();
+        return response;
     }
 }

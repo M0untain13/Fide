@@ -4,6 +4,7 @@ using Fide.Blazor.Extensions;
 using Fide.Blazor.Services;
 using Fide.Blazor.Services.AnalysisProxy;
 using Fide.Blazor.Services.EmailSender;
+using Fide.Blazor.Services.ImageLoader;
 using Fide.Blazor.Services.Repositories;
 using Fide.Blazor.Services.Repositories.Base;
 using Fide.Blazor.Services.S3Proxy;
@@ -77,7 +78,9 @@ public class Program
             .AddSingleton<IAnalysisProxy, AnalysisProxyStub>()
             .AddSingleton<IS3Proxy, S3ProxyStub>()
             .AddSingleton(_ => new FideEnvironment(isDebug: true))
-            .AddTransient<IRepository<ImageLink>, ImageLinkRepository>();
+            .AddSingleton<IImageLoader, ImageLoader>()
+            .AddTransient<IRepository<ImageLink>, ImageLinkRepository>()
+            .AddTransient<IRepository<ApplicationUser, string>, UserRepository>();
     }
 
     private static void ConfigureBuilderRelease(WebApplicationBuilder builder)
@@ -147,7 +150,9 @@ public class Program
             })
             .AddSingleton<IS3Proxy, MinioProxy>()
             .AddSingleton(_ => new FideEnvironment(isDebug: false))
-            .AddTransient<IRepository<ImageLink>, ImageLinkRepository>();
+            .AddSingleton<IImageLoader, ImageLoader>()
+            .AddTransient<IRepository<ImageLink>, ImageLinkRepository>()
+            .AddTransient<IRepository<ApplicationUser, string>, UserRepository>();
 
         builder.WebHost.UseUrls("http://[::]:80");
     }
@@ -176,6 +181,6 @@ public class Program
     }
 
     private static string GetRequiredEnvironmentVariable(string name)
-        => Environment.GetEnvironmentVariable(name) 
+        => Environment.GetEnvironmentVariable(name)
             ?? throw new NullReferenceException($"{name} is missing");
 }

@@ -2,4 +2,5 @@
 
 public class ImageUploadRequest
 {
+    public IEnumerable<Stream> FileStreams { get; set; }
 }

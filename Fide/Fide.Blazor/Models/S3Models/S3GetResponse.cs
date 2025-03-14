@@ -2,4 +2,5 @@
 
 public class S3GetResponse
 {
+    public Stream Stream { get; set; }
 }

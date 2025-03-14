@@ -2,4 +2,5 @@
 
 public class ImageDownloadResponse
 {
+    public IEnumerable<Stream> FileStreams { get; set; }
 }
