@@ -22,33 +22,7 @@ public class Program
     {
         var app = Build(args);
         Configure(app);
-        StartMigrate(app.Services);
         app.Run();
-    }
-
-    private static void StartMigrate(IServiceProvider services)
-    {
-        using var scope = services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var timeout = TimeSpan.FromSeconds(10);
-        if (context.Database.IsRelational())
-        {
-            var isConnected = false;
-            while (!isConnected)
-            {
-                if (context.Database.CanConnect())
-                {
-                    Console.WriteLine("Установлено подключение к БД, запуск миграции...");
-                    context.Database.Migrate();
-                    isConnected = true;
-                }
-                else
-                {
-                    Console.WriteLine("Не удается подключиться к БД");
-                    Thread.Sleep(timeout);
-                }
-            }
-        }
     }
 
     private static WebApplication Build(string[] args)
@@ -91,7 +65,7 @@ public class Program
 
     private static void ConfigureBuilderDebug(WebApplicationBuilder builder)
     {
-        Console.WriteLine("Используется DEBUG сборка");
+        Console.WriteLine("WARNING! DEBUG BUILD");
 
         ConfigureBuilderDefault(builder);
 
@@ -112,8 +86,6 @@ public class Program
 
     private static void ConfigureBuilderRelease(WebApplicationBuilder builder)
     {
-        Console.WriteLine("Используется RELEASE сборка");
-
         var connectionString = GetRequiredEnvironmentVariable("CONNECTION_STRING");
         var smtpHost = GetRequiredEnvironmentVariable("SMTP_HOST");
         var smtpPort = Convert.ToInt32(GetRequiredEnvironmentVariable("SMTP_PORT"));

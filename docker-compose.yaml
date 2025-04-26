@@ -7,16 +7,20 @@ services:
     - local_net
     ports:
     - "8080:80"
-    depends_on:
-    - database
-    - aomaca
-    - minio
   database:
     container_name: ${DATABASE_HOST}
-    image: mcr.microsoft.com/mssql/server:2022-CU17-ubuntu-22.04
-    env_file: "./.env"
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    env_file: .env
     environment:
       - ACCEPT_EULA=Y
+    networks:
+    - local_net
+    volumes:
+      - database_volume2:/var/opt/mssql
+  database-init:
+    container_name: migrate_database
+    build: ./Fide/Fide.Blazor/Data/MsSqlTools
+    env_file: "./.env"
     networks:
     - local_net
   aomaca:
@@ -27,8 +31,6 @@ services:
     - local_net
     ports:
     - "8090:80"
-    depends_on:
-    - minio
   minio:
     container_name: ${MINIO_HOST}
     image: bitnami/minio:2024.7.26
@@ -47,4 +49,4 @@ networks:
 
 volumes:
   minio_volume: {}
-  database_volume: {}
+  database_volume2: {}
