@@ -3,7 +3,7 @@ BEGIN
 
 CREATE TABLE [ImageLinks] (
     [Id] uniqueidentifier NOT NULL,
-    [UserId] nvarchar(450) NULL,
+    [UserId] nvarchar(100) NULL,
     [Url] nvarchar(max) NOT NULL,
     CONSTRAINT [PK_ImageLinks] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_ImageLinks_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id])

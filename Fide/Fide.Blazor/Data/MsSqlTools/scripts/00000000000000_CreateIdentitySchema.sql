@@ -16,18 +16,18 @@ IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'0000
 BEGIN
 
 CREATE TABLE [AspNetRoles] (
-    [Id] nvarchar(450) NOT NULL,
-    [Name] nvarchar(256) NULL,
-    [NormalizedName] nvarchar(256) NULL,
+    [Id] nvarchar(100) NOT NULL,
+    [Name] nvarchar(100) NULL,
+    [NormalizedName] nvarchar(100) NULL,
     [ConcurrencyStamp] nvarchar(max) NULL,
     CONSTRAINT [PK_AspNetRoles] PRIMARY KEY ([Id])
 );
 CREATE TABLE [AspNetUsers] (
-    [Id] nvarchar(450) NOT NULL,
-    [UserName] nvarchar(256) NULL,
-    [NormalizedUserName] nvarchar(256) NULL,
-    [Email] nvarchar(256) NULL,
-    [NormalizedEmail] nvarchar(256) NULL,
+    [Id] nvarchar(100) NOT NULL,
+    [UserName] nvarchar(100) NULL,
+    [NormalizedUserName] nvarchar(100) NULL,
+    [Email] nvarchar(100) NULL,
+    [NormalizedEmail] nvarchar(100) NULL,
     [EmailConfirmed] bit NOT NULL,
     [PasswordHash] nvarchar(max) NULL,
     [SecurityStamp] nvarchar(max) NULL,
@@ -42,7 +42,7 @@ CREATE TABLE [AspNetUsers] (
 );
 CREATE TABLE [AspNetRoleClaims] (
     [Id] int NOT NULL IDENTITY,
-    [RoleId] nvarchar(450) NOT NULL,
+    [RoleId] nvarchar(100) NOT NULL,
     [ClaimType] nvarchar(max) NULL,
     [ClaimValue] nvarchar(max) NULL,
     CONSTRAINT [PK_AspNetRoleClaims] PRIMARY KEY ([Id]),
@@ -50,31 +50,31 @@ CREATE TABLE [AspNetRoleClaims] (
 );
 CREATE TABLE [AspNetUserClaims] (
     [Id] int NOT NULL IDENTITY,
-    [UserId] nvarchar(450) NOT NULL,
+    [UserId] nvarchar(100) NOT NULL,
     [ClaimType] nvarchar(max) NULL,
     [ClaimValue] nvarchar(max) NULL,
     CONSTRAINT [PK_AspNetUserClaims] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_AspNetUserClaims_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE
 );
 CREATE TABLE [AspNetUserLogins] (
-    [LoginProvider] nvarchar(450) NOT NULL,
-    [ProviderKey] nvarchar(450) NOT NULL,
+    [LoginProvider] nvarchar(100) NOT NULL,
+    [ProviderKey] nvarchar(100) NOT NULL,
     [ProviderDisplayName] nvarchar(max) NULL,
-    [UserId] nvarchar(450) NOT NULL,
+    [UserId] nvarchar(100) NOT NULL,
     CONSTRAINT [PK_AspNetUserLogins] PRIMARY KEY ([LoginProvider], [ProviderKey]),
     CONSTRAINT [FK_AspNetUserLogins_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE
 );
 CREATE TABLE [AspNetUserRoles] (
-    [UserId] nvarchar(450) NOT NULL,
-    [RoleId] nvarchar(450) NOT NULL,
+    [UserId] nvarchar(100) NOT NULL,
+    [RoleId] nvarchar(100) NOT NULL,
     CONSTRAINT [PK_AspNetUserRoles] PRIMARY KEY ([UserId], [RoleId]),
     CONSTRAINT [FK_AspNetUserRoles_AspNetRoles_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [AspNetRoles] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_AspNetUserRoles_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE
 );
 CREATE TABLE [AspNetUserTokens] (
-    [UserId] nvarchar(450) NOT NULL,
-    [LoginProvider] nvarchar(450) NOT NULL,
-    [Name] nvarchar(450) NOT NULL,
+    [UserId] nvarchar(100) NOT NULL,
+    [LoginProvider] nvarchar(100) NOT NULL,
+    [Name] nvarchar(100) NOT NULL,
     [Value] nvarchar(max) NULL,
     CONSTRAINT [PK_AspNetUserTokens] PRIMARY KEY ([UserId], [LoginProvider], [Name]),
     CONSTRAINT [FK_AspNetUserTokens_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [AspNetUsers] ([Id]) ON DELETE CASCADE

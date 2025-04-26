@@ -23,7 +23,51 @@ public class Program
     {
         var app = Build(args);
         ConfigureApp(app);
-        app.Run();
+
+        var isConnected = TryConnectAndMigrate(app);
+
+        if (isConnected)
+        {
+            app.Run();
+        }
+        else
+        {
+            throw new Exception("Не удалось подключиться к БД");
+        }
+    }
+
+    private static bool TryConnectAndMigrate(WebApplication app)
+    {
+        var isConnected = false;
+        using var scope = app.Services.CreateScope();
+        var tryConnectCount = 3;
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        if (context.Database.IsRelational())
+        {
+            var timeout = 5000;
+            while (tryConnectCount > 0)
+            {
+                Thread.Sleep(timeout);
+                if (context.Database.CanConnect())
+                {
+                    Console.WriteLine("Установлено подключение к БД");
+                    context.Database.Migrate();
+                    isConnected = true;
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Не удается подключиться к БД");
+                    tryConnectCount--;
+                    timeout += 5000;
+                }
+            }
+        }
+        else
+        {
+            isConnected = context.Database.CanConnect();
+        }
+        return isConnected;
     }
 
     private static WebApplication Build(string[] args)

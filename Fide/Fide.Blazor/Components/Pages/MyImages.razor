@@ -1,43 +1,48 @@
 ﻿@page "/myimages"
 
-@using Microsoft.AspNetCore.Authorization
-@using Fide.Blazor.Services.ImageLoader
-@using Fide.Blazor.Models.ImageLoaderModels
+@using Microsoft.AspNetCore.Authorization;
 @using System.Collections.Generic;
+@using Fide.Blazor.Data;
+@using Fide.Blazor.Services.ImageManager
+@using Fide.Blazor.Services.Repositories.Base
+
 
 @inject AuthenticationStateProvider ContextProvider
-@inject IImageLoader ImageLoader
+@inject IUserRepository<ApplicationUser> users
+@inject IImageManager ImageManager
 @attribute [Authorize]
 
 <PageTitle>Мои изображения</PageTitle>
 
-@if (Images is null)
+@if (User is null)
 {
     <p>Загрузка...</p>
 }
 else
 {
-    if(Images.Count == 0)
+    if (User.ImageLinks.Count == 0)
     {
-        <p>Пусто :(</p>
+        <p>У Вас пока что нет изображений</p>
     }
     else
     {
-        foreach (var image in Images)
+        foreach (var image in User.ImageLinks.Skip(AmountImagesByPage * ImagePage).Take(AmountImagesByPage))
         {
-            <p>@image.Length</p>
+            <img src="@image.Url"/>
         }
     }
 }
 
-<InputFile OnChange="LoadFiles" multiple />
+<InputFile OnChange="UploadImages" multiple />
 
 @code {
-    private List<byte[]>? Images;
+    private ApplicationUser? User { get; set; }
 
-    private int TakedImagesCount;
+    private int ImagePage { get; set; } = 1;
 
-    private void LoadFiles(InputFileChangeEventArgs e)
+    private int AmountImagesByPage { get; set; } = 10;
+
+    private async void UploadImages(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles();
 
@@ -45,41 +50,16 @@ else
 
         foreach(var file in files)
         {
-            fileStreams.Add(file.OpenReadStream());
+            var image = await ImageManager.UploadImageAsync(file.OpenReadStream(), file.Name);
+            User.ImageLinks.Add(image);
+            users.Update(User);
+            users.Save();
         }
-
-        var request = new ImageUploadRequest()
-        {
-            FileStreams = fileStreams,
-        };
-        var response = ImageLoader.Upload(request);
-
-        // TODO: Указать, были изображение успешно загружено
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadImages();
-    }
-
-    private async Task LoadImages()
-    {
         var context = await ContextProvider.GetAuthenticationStateAsync();
-        var request = new ImageDownloadRequest()
-        {
-            UserName = context.User.Identity.Name,
-            Skip = TakedImagesCount,
-            Take = 10,
-        };
-        TakedImagesCount += 10;
-        var response = ImageLoader.Download(request);
-        Images = new();
-        foreach (var stream in response.FileStreams)
-        {
-            // TODO: Загрузить из потока изображение в ОЗУ
-            // TODO: Добавить изображение в Images
-        }
+        User = users.Get(context.User.Identity.Name);
     }
-
-    // TODO: Добавить кнопку "Загрузить еще", которая будет делать Skip += 10 при запросе изображений
 }

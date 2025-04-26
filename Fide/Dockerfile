@@ -1,5 +1,5 @@
 # Этот этап используется при запуске из VS в быстром режиме (по умолчанию для конфигурации отладки)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy-amd64 AS base
 USER $APP_UID
 WORKDIR /app
 EXPOSE 80
