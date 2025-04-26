@@ -22,7 +22,33 @@ public class Program
     {
         var app = Build(args);
         Configure(app);
+        StartMigrate(app.Services);
         app.Run();
+    }
+
+    private static void StartMigrate(IServiceProvider services)
+    {
+        using var scope = services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var timeout = TimeSpan.FromSeconds(10);
+        if (context.Database.IsRelational())
+        {
+            var isConnected = false;
+            while (!isConnected)
+            {
+                if (context.Database.CanConnect())
+                {
+                    Console.WriteLine("Установлено подключение к БД, запуск миграции...");
+                    context.Database.Migrate();
+                    isConnected = true;
+                }
+                else
+                {
+                    Console.WriteLine("Не удается подключиться к БД");
+                    Thread.Sleep(timeout);
+                }
+            }
+        }
     }
 
     private static WebApplication Build(string[] args)

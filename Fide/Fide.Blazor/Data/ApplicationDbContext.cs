@@ -1,26 +1,18 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Fide.Blazor.Data;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
     public DbSet<ImageLink> ImageLinks { get; set; }
 
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        if (Database.GetService<IDatabaseCreator>() is RelationalDatabaseCreator dbCreater)
-        {
-            if (!dbCreater.CanConnect())
-            {
-                dbCreater.Create();
-            }
-            if (!dbCreater.HasTables())
-            {
-                dbCreater.CreateTables();
-            }
-        }
+        base.OnModelCreating(builder);
+
+        builder.Entity<ImageLink>()
+            .HasOne(i => i.User)
+            .WithMany(i => i.ImageLinks);
     }
 }

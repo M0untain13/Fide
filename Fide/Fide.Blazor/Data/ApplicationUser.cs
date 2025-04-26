@@ -4,5 +4,5 @@ namespace Fide.Blazor.Data;
 
 public class ApplicationUser : IdentityUser
 {
-    public virtual List<ImageLink> ImageLinks { get; set; }
+    public virtual IList<ImageLink> ImageLinks { get; set; } = [];
 }
