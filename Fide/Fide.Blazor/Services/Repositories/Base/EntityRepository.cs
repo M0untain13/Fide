@@ -4,19 +4,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Fide.Blazor.Services.Repositories.Base;
 
-public abstract class EntityRepository<T>(ApplicationDbContext context) : IRepository<T>
+public abstract class EntityRepository<T>(ApplicationDbContext context) : IEntityRepository<T>
     where T : Entity
 {
     protected abstract DbSet<T> DbSet { get; }
 
-    public T Get(Guid id)
+    protected virtual IQueryable<T> Include(IQueryable<T> query)
     {
-        return DbSet.First(s => s.Id == id);
+        return query;
+    }
+
+    public T? Get(Guid id)
+    {
+        return Include(DbSet).FirstOrDefault(s => s.Id == id);
     }
 
     public IEnumerable<T> GetAll()
     {
-        return DbSet;
+        return Include(DbSet);
     }
 
     public void Create(T item)

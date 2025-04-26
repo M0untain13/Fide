@@ -1,18 +1,19 @@
+using Amazon.S3;
 using Fide.Blazor.Components;
 using Fide.Blazor.Data;
 using Fide.Blazor.Extensions;
 using Fide.Blazor.Services;
 using Fide.Blazor.Services.AnalysisProxy;
 using Fide.Blazor.Services.EmailSender;
-using Fide.Blazor.Services.ImageLoader;
+using Fide.Blazor.Services.FileStorage;
+using Fide.Blazor.Services.ImageManager;
 using Fide.Blazor.Services.Repositories;
 using Fide.Blazor.Services.Repositories.Base;
-using Fide.Blazor.Services.S3Proxy;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using Minio;
+using Microsoft.Extensions.Options;
 
 namespace Fide.Blazor;
 
@@ -21,29 +22,25 @@ public class Program
     public static void Main(string[] args)
     {
         var app = Build(args);
-        Configure(app);
+        ConfigureApp(app);
         app.Run();
     }
 
     private static WebApplication Build(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
-#if RELEASE
-        ConfigureBuilderRelease(builder);
-#else
-        ConfigureBuilderDebug(builder);
-#endif
-
+        ConfigureBuilder(builder);
         return builder.Build();
     }
 
-    private static void ConfigureBuilderDefault(WebApplicationBuilder builder)
+    private static void ConfigureBuilder(WebApplicationBuilder builder)
     {
+        builder.Configuration.AddJsonFile("appsettings.Local.json");
+
+        // Дефолтные настройки проекта
         builder.Services
             .AddRazorComponents()
             .AddInteractiveServerComponents();
-
         builder.Services
             .AddCascadingAuthenticationState()
             .AddScoped<IdentityUserAccessor>()
@@ -61,77 +58,51 @@ public class Program
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddSignInManager()
             .AddDefaultTokenProviders();
-    }
 
-    private static void ConfigureBuilderDebug(WebApplicationBuilder builder)
-    {
-        Console.WriteLine("WARNING! DEBUG BUILD");
+        // Конфиги
+        builder.Services.Configure<S3Options>(builder.Configuration.GetSection("S3"));
+        builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("SMTP"));
+        builder.Services.Configure<AomacaOptions>(builder.Configuration.GetSection("Aomaca"));
 
-        ConfigureBuilderDefault(builder);
-
+        // База данных
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseInMemoryDatabase("Fide")
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
         );
-        builder.Services
-            .AddDatabaseDeveloperPageExceptionFilter();
-        builder.Services
-            .AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>()
-            .AddSingleton<IAnalysisProxy, AnalysisProxyStub>()
-            .AddSingleton<IS3Proxy, S3ProxyStub>()
-            .AddSingleton(_ => new FideEnvironment(isDebug: true))
-            .AddScoped<IImageLoader, ImageLoader>()
-            .AddTransient<IRepository<ImageLink>, ImageLinkRepository>()
-            .AddTransient<IRepository<ApplicationUser, string>, UserRepository>();
-    }
 
-    private static void ConfigureBuilderRelease(WebApplicationBuilder builder)
-    {
-        var connectionString = GetRequiredEnvironmentVariable("CONNECTION_STRING");
-        var smtpHost = GetRequiredEnvironmentVariable("SMTP_HOST");
-        var smtpPort = Convert.ToInt32(GetRequiredEnvironmentVariable("SMTP_PORT"));
-        var smtpEmail = GetRequiredEnvironmentVariable("SMTP_EMAIL");
-        var smtpPassword = GetRequiredEnvironmentVariable("SMTP_PASSWORD");
-        var minioHost = GetRequiredEnvironmentVariable("MINIO_HOST");
-        var minioUser = GetRequiredEnvironmentVariable("MINIO_ROOT_USER");
-        var minioPassword = GetRequiredEnvironmentVariable("MINIO_ROOT_PASSWORD");
-        var aomacaHost = GetRequiredEnvironmentVariable("AOMACA_HOST");
-
-        ConfigureBuilderDefault(builder);
-
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString)
-        );
+        // Почтовый клиент
         builder.Services
             .AddSingleton<IEmailSender<ApplicationUser>, ApplicationUserEmailSender>()
-            .AddSingleton<IEmailSender>(provider =>
+            .AddSingleton<IEmailSender, SmtpEmailSender>();
+
+        // Репозитории
+        builder.Services
+            .AddTransient<IEntityRepository<ImageLink>, ImageLinkRepository>()
+            .AddTransient<IUserRepository<ApplicationUser>, UserRepository>();
+
+        // Хранилище файлов
+        builder.Services.AddSingleton<IAmazonS3>(provider =>
+        {
+            var options = provider.GetRequiredService<IOptions<S3Options>>().Value;
+            var config = new AmazonS3Config
             {
-                return new SmtpEmailSender(smtpHost, smtpPort, smtpEmail, smtpPassword);
-            })
-            .AddMinio(configureClient =>
-            {
-                configureClient
-                    .WithEndpoint(minioHost)
-                    .WithCredentials(minioUser, minioPassword)
-                    .Build();
-            })
-            .AddSingleton<IAnalysisProxy>(provider =>
-            {
-                var httpClient = new HttpClient
-                {
-                    BaseAddress = new Uri($"http://{aomacaHost}")
-                };
-                var logger = provider.GetRequiredService<ILogger<AomacaProxy>>();
-                return new AomacaProxy(httpClient, logger);
-            })
-            .AddSingleton<IS3Proxy, MinioProxy>()
-            .AddSingleton(_ => new FideEnvironment(isDebug: false))
-            .AddScoped<IImageLoader, ImageLoader>()
-            .AddTransient<IRepository<ImageLink>, ImageLinkRepository>()
-            .AddTransient<IRepository<ApplicationUser, string>, UserRepository>();
-        builder.WebHost.UseUrls("http://[::]:80");
+                ServiceURL = options.ServiceURL,
+                ForcePathStyle = options.ForcePathStyle
+            };
+            return new AmazonS3Client(
+                options.AccessKey,
+                options.SecretKey,
+                config
+            );
+        });
+        builder.Services.AddScoped<IFileStorage, S3Service>();
+
+        // Остальное
+        builder.Services
+            .AddSingleton<IAnalysisProxy, AomacaProxy>()
+            .AddScoped<IImageManager, ImageManager>();
     }
 
-    private static void Configure(WebApplication app)
+    private static void ConfigureApp(WebApplication app)
     {
         if (app.Environment.IsDevelopment())
         {
@@ -153,8 +124,4 @@ public class Program
 
         app.MapAdditionalIdentityEndpoints();
     }
-
-    private static string GetRequiredEnvironmentVariable(string name)
-        => Environment.GetEnvironmentVariable(name)
-            ?? throw new NullReferenceException($"{name} is missing");
 }

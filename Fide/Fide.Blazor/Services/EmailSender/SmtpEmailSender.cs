@@ -1,23 +1,25 @@
 ﻿using System.Net;
 using System.Net.Mail;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Options;
 
 namespace Fide.Blazor.Services.EmailSender;
 
-public class SmtpEmailSender(string host, int port, string email, string password) : IEmailSender
+public class SmtpEmailSender(IOptions<SmtpOptions> options) : IEmailSender
 {
+    private readonly SmtpOptions _smtpOptions = options.Value;
+
     public Task SendEmailAsync(string recipientEmail, string subject, string message)
     {
-        using var client = new SmtpClient(host)
+        using var client = new SmtpClient(_smtpOptions.Host, _smtpOptions.Port)
         {
-            Port = port,
-            Credentials = new NetworkCredential(email, password),
+            Credentials = new NetworkCredential(_smtpOptions.Email, _smtpOptions.Password),
             EnableSsl = true,
         };
 
         return client.SendMailAsync(
             new MailMessage(
-                from: email,
+                from: _smtpOptions.Email,
                 to: recipientEmail,
                 subject,
                 message

@@ -1,4 +1,4 @@
-﻿using Fide.Blazor.Models.AnalysisModels;
+﻿using Fide.Blazor.DTO.Analysis;
 
 namespace Fide.Blazor.Services.AnalysisProxy;
 

@@ -1,8 +1,8 @@
-﻿namespace Fide.Blazor.Models.ImageLoaderModels;
+﻿namespace Fide.Blazor.DTO.ImageLoader;
 
 public class ImageDownloadRequest
 {
-    public string UserName { get; set; }
+    public required string UserName { get; set; }
     public int Skip { get; set; }
     public int Take { get; set; }
 }

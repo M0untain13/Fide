@@ -1,18 +1,24 @@
 ﻿using Fide.Blazor.Data;
 using Fide.Blazor.Services.Repositories.Base;
+using Microsoft.EntityFrameworkCore;
 
 namespace Fide.Blazor.Services.Repositories;
 
-public class UserRepository(ApplicationDbContext context) : IRepository<ApplicationUser, string>
+public class UserRepository(ApplicationDbContext context) : IUserRepository<ApplicationUser>
 {
-    public ApplicationUser Get(string id)
+    public IQueryable<ApplicationUser> Include(IQueryable<ApplicationUser> query)
     {
-        return context.Users.First(u => u.Email == id);
+        return query.Include(u => u.ImageLinks);
+    }
+
+    public ApplicationUser? Get(string id)
+    {
+        return Include(context.Users).FirstOrDefault(u => u.Email == id);
     }
 
     public IEnumerable<ApplicationUser> GetAll()
     {
-        return context.Users;
+        return Include(context.Users);
     }
 
     public void Create(ApplicationUser item)
@@ -33,7 +39,7 @@ public class UserRepository(ApplicationDbContext context) : IRepository<Applicat
 
     public void Update(ApplicationUser item)
     {
-        context.Entry(item).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        context.Entry(item).State = EntityState.Modified;
     }
 
     private bool _disposed = false;

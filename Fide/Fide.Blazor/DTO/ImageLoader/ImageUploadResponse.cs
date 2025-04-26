@@ -1,4 +1,4 @@
-﻿namespace Fide.Blazor.Models.ImageLoaderModels;
+﻿namespace Fide.Blazor.DTO.ImageLoader;
 
 public class ImageUploadResponse
 {

@@ -1,14 +1,21 @@
 ﻿using System.Text.Json;
-using Fide.Blazor.Models.AnalysisModels;
+using Fide.Blazor.DTO.Analysis;
+using Microsoft.Extensions.Options;
 
 namespace Fide.Blazor.Services.AnalysisProxy;
 
-public class AomacaProxy(HttpClient httpClient, ILogger<AomacaProxy> logger) : IAnalysisProxy
+public class AomacaProxy(IOptions<AomacaOptions> options, ILogger<AomacaProxy> logger) : IAnalysisProxy
 {
+    public readonly AomacaOptions _aomacaOptions = options.Value;
+
     public async Task<AnalysisResponse> SendAsync(AnalysisRequest request)
     {
         try
         {
+            using var httpClient = new HttpClient
+            {
+                BaseAddress = new Uri(_aomacaOptions.ServiceUrl)
+            };
             var json = JsonSerializer.Serialize(request);
             var requestContent = new StringContent(json);
             var response = await httpClient.PostAsync("/analysis", requestContent);
