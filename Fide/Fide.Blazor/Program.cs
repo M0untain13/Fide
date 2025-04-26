@@ -64,10 +64,8 @@ public class Program
         return builder.Build();
     }
 
-    private static void ConfigureBuilderDebug(WebApplicationBuilder builder)
+    private static void ConfigureBuilderDefault(WebApplicationBuilder builder)
     {
-        Console.WriteLine("Используется DEBUG сборка");
-
         builder.Services
             .AddRazorComponents()
             .AddInteractiveServerComponents();
@@ -77,7 +75,6 @@ public class Program
             .AddScoped<IdentityUserAccessor>()
             .AddScoped<IdentityRedirectManager>()
             .AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
-
         builder.Services
             .AddAuthentication(options =>
             {
@@ -85,20 +82,24 @@ public class Program
                 options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
             })
             .AddIdentityCookies();
-
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseInMemoryDatabase("Fide")
-        );
-
-        builder.Services
-            .AddDatabaseDeveloperPageExceptionFilter();
-
         builder.Services
             .AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddSignInManager()
             .AddDefaultTokenProviders();
+    }
 
+    private static void ConfigureBuilderDebug(WebApplicationBuilder builder)
+    {
+        Console.WriteLine("Используется DEBUG сборка");
+
+        ConfigureBuilderDefault(builder);
+
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseInMemoryDatabase("Fide")
+        );
+        builder.Services
+            .AddDatabaseDeveloperPageExceptionFilter();
         builder.Services
             .AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>()
             .AddSingleton<IAnalysisProxy, AnalysisProxyStub>()
@@ -123,35 +124,11 @@ public class Program
         var minioPassword = GetRequiredEnvironmentVariable("MINIO_ROOT_PASSWORD");
         var aomacaHost = GetRequiredEnvironmentVariable("AOMACA_HOST");
 
-        builder.Services
-            .AddRazorComponents()
-            .AddInteractiveServerComponents();
-
-        builder.Services
-            .AddCascadingAuthenticationState()
-            .AddScoped<IdentityUserAccessor>()
-            .AddScoped<IdentityRedirectManager>()
-            .AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
-
-        builder.Services
-            .AddAuthentication(options =>
-            {
-                options.DefaultScheme = IdentityConstants.ApplicationScheme;
-                options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-            })
-            .AddIdentityCookies();
-
+        ConfigureBuilderDefault(builder);
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString)
         );
-
-        builder.Services
-            .AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-            .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddSignInManager()
-            .AddDefaultTokenProviders();
-
         builder.Services
             .AddSingleton<IEmailSender<ApplicationUser>, ApplicationUserEmailSender>()
             .AddSingleton<IEmailSender>(provider =>
@@ -179,7 +156,6 @@ public class Program
             .AddScoped<IImageLoader, ImageLoader>()
             .AddTransient<IRepository<ImageLink>, ImageLinkRepository>()
             .AddTransient<IRepository<ApplicationUser, string>, UserRepository>();
-
         builder.WebHost.UseUrls("http://[::]:80");
     }
 
