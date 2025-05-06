@@ -1,0 +1,39 @@
+﻿@typeparam TItem
+
+<div class="grid-container grid-columns-@Columns">
+    @foreach (var item in Source)
+    {
+        <div class="grid-item-content">
+            @ChildContent(item)
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public required RenderFragment<TItem> ChildContent { get; set; }
+
+    [Parameter]
+    public required IEnumerable<TItem> Source { get; set; }
+
+    [Parameter]
+    public int Columns { get; set; } = 3;
+
+    [Parameter]
+    public string Gap { get; set; } = "10px";
+
+    private string GetGridStyle()
+    {
+        return $"display: grid; grid-template-columns: repeat({Columns}, 1fr); gap: {Gap};";
+    }
+
+    private string GetItemStyle()
+    {
+        return "display: flex;";
+    }
+
+    public void Update()
+    {
+        StateHasChanged();
+    }
+}

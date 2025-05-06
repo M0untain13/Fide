@@ -17,6 +17,8 @@ services:
       - local_net
     volumes:
       - database_volume10:/var/opt/mssql
+    ports:
+      - 7001:1433
   database-init:
     container_name: migrate_database
     build: ./Fide/Fide.Blazor/Data/MsSqlTools

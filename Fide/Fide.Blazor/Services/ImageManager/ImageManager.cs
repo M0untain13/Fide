@@ -20,7 +20,7 @@ public class ImageManager(IFileStorage storage, IEntityRepository<ImageLink> ima
         {
             Url = storage.GetFileUrl(nameInBucket),
         };
-        imageRepository.Update(image);
+        imageRepository.Create(image);
         imageRepository.Save();
         return image;
     }

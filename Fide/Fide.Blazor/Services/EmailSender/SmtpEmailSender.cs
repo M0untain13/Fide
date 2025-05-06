@@ -9,21 +9,24 @@ public class SmtpEmailSender(IOptions<SmtpOptions> options) : IEmailSender
 {
     private readonly SmtpOptions _smtpOptions = options.Value;
 
-    public Task SendEmailAsync(string recipientEmail, string subject, string message)
+    public async Task SendEmailAsync(string recipientEmail, string subject, string message)
     {
         using var client = new SmtpClient(_smtpOptions.Host, _smtpOptions.Port)
         {
             Credentials = new NetworkCredential(_smtpOptions.Email, _smtpOptions.Password),
-            EnableSsl = true,
+            EnableSsl = true
         };
 
-        return client.SendMailAsync(
-            new MailMessage(
-                from: _smtpOptions.Email,
-                to: recipientEmail,
-                subject,
-                message
-            )
-        );
+        var mailMessage = new MailMessage(
+            from: _smtpOptions.Email,
+            to: recipientEmail,
+            subject,
+            message
+        )
+        {
+            IsBodyHtml = true
+        };
+
+        await client.SendMailAsync(mailMessage);
     }
 }

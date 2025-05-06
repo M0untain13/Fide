@@ -1,0 +1,64 @@
+﻿@using Fide.Blazor.Data;
+
+<div class="image-frame @(_hasTwoImages ? "double-image" : "")">
+    @if (ImageLink?.Url != null)
+    {
+        <div class="image-container">
+            <img src="@ImageLink.Url" alt="Main image" class="displayed-image" />
+            @*
+            @if (ImageData.SecondImageUrl != null)
+            {
+                <img src="@ImageData.SecondImageUrl" alt="Secondary image" class="displayed-image" />
+            }
+            *@
+        </div>
+
+        <div class="button-group">
+            @if (OnDelete is not null)
+            {
+                <button @onclick="DeleteImage" class="action-button delete-button">
+                    Удалить
+                </button>
+            }
+            @if (OnAnalyze is not null)
+            {
+                <button @onclick="AnalyzeImage" class="action-button analyze-button">
+                    Анализ
+                </button>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-image">No image to display</div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public required ImageLink ImageLink { get; set; }
+
+    [Parameter]
+    public EventCallback<ImageLink>? OnDelete { get; set; }
+
+    [Parameter]
+    public EventCallback<ImageLink>? OnAnalyze { get; set; }
+
+    private bool _hasTwoImages => false;
+
+    private async Task DeleteImage()
+    {
+        if (OnDelete is EventCallback<ImageLink> callback)
+        {
+            await callback.InvokeAsync(ImageLink);
+        }
+    }
+
+    private async Task AnalyzeImage()
+    {
+        if (OnAnalyze is EventCallback<ImageLink> callback)
+        {
+            await callback.InvokeAsync(ImageLink);
+        }
+    }
+}

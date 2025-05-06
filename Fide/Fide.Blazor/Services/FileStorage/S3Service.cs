@@ -1,4 +1,5 @@
-﻿using Amazon.S3;
+﻿using System;
+using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Util;
 using Microsoft.Extensions.Options;
@@ -16,10 +17,14 @@ public class S3Service(IAmazonS3 s3Client, IOptions<S3Options> options) : IFileS
         if (!bucketExists)
             throw new InvalidOperationException($"Bucket {_options.BucketName} не существует");
 
+        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+        string extension = Path.GetExtension(fileName);
+        string newFileName = $"{fileNameWithoutExtension}_{Guid.NewGuid()}{extension}";
+
         var request = new PutObjectRequest
         {
             BucketName = _options.BucketName,
-            Key = fileName + Guid.NewGuid().ToString(),
+            Key = newFileName,
             InputStream = fileStream
         };
 
