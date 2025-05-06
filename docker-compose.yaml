@@ -14,9 +14,9 @@ services:
     environment:
       - ACCEPT_EULA=Y
     networks:
-    - local_net
+      - local_net
     volumes:
-      - database_volume5:/var/opt/mssql
+      - database_volume10:/var/opt/mssql
   database-init:
     container_name: migrate_database
     build: ./Fide/Fide.Blazor/Data/MsSqlTools
@@ -49,4 +49,4 @@ networks:
 
 volumes:
   minio_volume: {}
-  database_volume5: {}
+  database_volume10: {}
