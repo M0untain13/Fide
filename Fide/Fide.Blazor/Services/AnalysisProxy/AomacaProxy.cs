@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Fide.Blazor.DTO.Analysis;
 using Microsoft.Extensions.Options;
 
@@ -17,11 +19,11 @@ public class AomacaProxy(IOptions<AomacaOptions> options, ILogger<AomacaProxy> l
                 BaseAddress = new Uri(_aomacaOptions.ServiceUrl)
             };
             var json = JsonSerializer.Serialize(request);
-            var requestContent = new StringContent(json);
+            var requestContent = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync("/analysis", requestContent);
             var responseContent = await response.Content.ReadAsStringAsync();
             var obj = JsonSerializer.Deserialize<AnalysisResponse>(responseContent)
-                ?? throw new NullReferenceException("Был получен пустой ответ от сервиса анализа");
+                ?? throw new NullReferenceException("Был получен некорректный ответ от сервиса анализа");
             return obj;
         }
         catch (Exception ex)

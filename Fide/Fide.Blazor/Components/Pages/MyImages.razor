@@ -4,22 +4,25 @@
 @using System.Collections.Generic;
 @using Fide.Blazor.Data;
 @using Fide.Blazor.Services.FileStorage
+@using Fide.Blazor.Services.AnalysisProxy
 @using Fide.Blazor.Services.Data.UnitOfWork
 @using Fide.Blazor.Services.Repositories.Base
 @using Fide.Blazor.Components.Components
+@using DTO.Analysis
 
 @inject AuthenticationStateProvider ContextProvider
 @inject IUnitOfWork uow
 @inject IFileStorage storage
+@inject IAnalysisProxy analysisClient
 @attribute [Authorize]
 
 <PageTitle>Мои изображения</PageTitle>
 
 @if (IsCanLeft() || IsCanRight())
 {
-    <button @onclick="Left" disabled="@(!IsCanLeft())">left</button>
-    <button @onclick="Right" disabled="@(!IsCanRight())">right</button>
-    <div>Страница @(ImagePage + 1)</div>
+    <button @onclick="Left" disabled="@(!IsCanLeft())">@("<")</button>
+    @(ImagePage + 1)
+    <button @onclick="Right" disabled="@(!IsCanRight())">></button>
 }
 
 <InputFile OnChange="UploadImages" multiple accept=".jpg" class="inputfile-text" />
@@ -37,7 +40,7 @@ else
     else
     {
         <Grid Source="RenderImages" @ref="grid">
-            <Image ImageLink="context" OnDelete="DeleteImage" />
+            <Image ImageLink="context" OnDelete="DeleteImage" OnAnalyze="AnalisysImage" />
         </Grid>
     }
 }
@@ -68,7 +71,7 @@ else
                 var nameInBucket = await storage.UploadFileAsync(file.OpenReadStream(), file.Name);
                 var image = new ImageLink()
                 {
-                    Url = nameInBucket,
+                    OriginalName = nameInBucket,
                 };
                 await images.AddAsync(image);
                 User.ImageLinks.Add(image);
@@ -88,7 +91,7 @@ else
         User.ImageLinks.Remove(imageLink);
         users.Update(User);
 
-        await storage.DeleteFileAsync(imageLink.Url);
+        await storage.DeleteFileAsync(imageLink.OriginalName);
         images.Remove(imageLink);
 
         await uow.CommitAsync();
@@ -99,6 +102,25 @@ else
         }
 
         grid?.Update();
+    }
+
+    private async Task AnalisysImage(ImageLink imageLink)
+    {
+        if(imageLink.AnalysisName is null)
+        {
+            var request = new AnalysisRequest()
+            {
+                // TODO: исправить захардкоженный бакет
+                BucketName = "filesbucket",
+                ObjectName = imageLink.OriginalName
+            };
+            var response = await analysisClient.SendAsync(request);
+            imageLink.AnalysisName = response.ObjectName;
+
+            var images = uow.GetRepository<ImageLink>();
+            images.Update(imageLink);
+            await uow.CommitAsync();
+        }
     }
 
     private bool IsCanLeft() => ImagePage > 0;

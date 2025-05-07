@@ -58,7 +58,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        url = await storage.GeneratePresignedUrl(ImageLink.Url, new TimeSpan(1, 0, 0));
+        url = await storage.GeneratePresignedUrl(ImageLink.OriginalName, new TimeSpan(1, 0, 0));
         // TODO: костыль, который потом убрать!
         url = url.Replace("https", "http");
     }
