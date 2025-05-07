@@ -4,11 +4,9 @@ using Fide.Blazor.Data;
 using Fide.Blazor.Extensions;
 using Fide.Blazor.Services;
 using Fide.Blazor.Services.AnalysisProxy;
+using Fide.Blazor.Services.Data.UnitOfWork;
 using Fide.Blazor.Services.EmailSender;
 using Fide.Blazor.Services.FileStorage;
-using Fide.Blazor.Services.ImageManager;
-using Fide.Blazor.Services.Repositories;
-using Fide.Blazor.Services.Repositories.Base;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -79,19 +77,20 @@ public class Program
         builder.Services.Configure<AomacaOptions>(builder.Configuration.GetSection("Aomaca"));
 
         // База данных
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-        );
+        builder.Services
+            .AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+            )
+            .AddScoped<IUnitOfWork>(provider =>
+            {
+                var context = provider.GetRequiredService<ApplicationDbContext>();
+                return new UnitOfWork(context);
+            });
 
         // Почтовый клиент
         builder.Services
             .AddSingleton<IEmailSender<ApplicationUser>, ApplicationUserEmailSender>()
             .AddSingleton<IEmailSender, SmtpEmailSender>();
-
-        // Репозитории
-        builder.Services
-            .AddTransient<IEntityRepository<ImageLink>, ImageLinkRepository>()
-            .AddTransient<IUserRepository<ApplicationUser>, UserRepository>();
 
         // Хранилище файлов
         builder.Services.AddSingleton<IAmazonS3>(provider =>
@@ -110,10 +109,9 @@ public class Program
         });
         builder.Services.AddScoped<IFileStorage, S3Service>();
 
-        // Остальное
+        // Прокси
         builder.Services
-            .AddSingleton<IAnalysisProxy, AomacaProxy>()
-            .AddScoped<IImageManager, ImageManager>();
+            .AddSingleton<IAnalysisProxy, AomacaProxy>();
     }
 
     private static void ConfigureApp(WebApplication app)

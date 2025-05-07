@@ -1,10 +1,14 @@
 ﻿@using Fide.Blazor.Data;
 
+@using Fide.Blazor.Services.FileStorage
+
+@inject IFileStorage storage
+
 <div class="image-frame @(_hasTwoImages ? "double-image" : "")">
-    @if (ImageLink?.Url != null)
+    @if (url != null)
     {
         <div class="image-container">
-            <img src="@ImageLink.Url" alt="Main image" class="displayed-image" />
+            <img src="@url" alt="Main image" class="displayed-image" />
             @*
             @if (ImageData.SecondImageUrl != null)
             {
@@ -29,6 +33,8 @@
 </div>
 
 @code {
+    private string? url { get; set; }
+
     [Parameter]
     public required ImageLink ImageLink { get; set; }
 
@@ -48,5 +54,12 @@
     private async Task AnalyzeImage()
     {
         await OnAnalyze.InvokeAsync(ImageLink);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        url = await storage.GeneratePresignedUrl(ImageLink.Url, new TimeSpan(1, 0, 0));
+        // TODO: костыль, который потом убрать!
+        url = url.Replace("https", "http");
     }
 }

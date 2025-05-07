@@ -3,13 +3,14 @@
 @using Microsoft.AspNetCore.Authorization;
 @using System.Collections.Generic;
 @using Fide.Blazor.Data;
-@using Fide.Blazor.Services.ImageManager
+@using Fide.Blazor.Services.FileStorage
+@using Fide.Blazor.Services.Data.UnitOfWork
 @using Fide.Blazor.Services.Repositories.Base
 @using Fide.Blazor.Components.Components
 
 @inject AuthenticationStateProvider ContextProvider
-@inject IUserRepository<ApplicationUser> users
-@inject IImageManager ImageManager
+@inject IUnitOfWork uow
+@inject IFileStorage storage
 @attribute [Authorize]
 
 <PageTitle>Мои изображения</PageTitle>
@@ -21,7 +22,7 @@
     <div>Страница @(ImagePage + 1)</div>
 }
 
-<InputFile OnChange="UploadImages" multiple accept=".jpg" />
+<InputFile OnChange="UploadImages" multiple accept=".jpg" class="inputfile-text" />
 
 @if (User is null)
 {
@@ -58,31 +59,50 @@ else
 
         var fileStreams = new List<Stream>();
 
+        var users = uow.GetRepository<ApplicationUser>();
+        var images = uow.GetRepository<ImageLink>();
         foreach(var file in files)
         {
             if (file.ContentType == "image/jpeg")
             {
-                var image = await ImageManager.UploadImageAsync(file.OpenReadStream(), file.Name);
+                var nameInBucket = await storage.UploadFileAsync(file.OpenReadStream(), file.Name);
+                var image = new ImageLink()
+                {
+                    Url = nameInBucket,
+                };
+                await images.AddAsync(image);
                 User.ImageLinks.Add(image);
                 users.Update(User);
-                users.Save();
             }
         }
+        await uow.CommitAsync();
 
         grid?.Update();
     }
 
     private async Task DeleteImage(ImageLink imageLink)
     {
+        var users = uow.GetRepository<ApplicationUser>();
+        var images = uow.GetRepository<ImageLink>();
+
         User.ImageLinks.Remove(imageLink);
         users.Update(User);
-        users.Save();
-        await ImageManager.DeleteImageAsync(imageLink);
+
+        await storage.DeleteFileAsync(imageLink.Url);
+        images.Remove(imageLink);
+
+        await uow.CommitAsync();
+
+        if(IsCanLeft() && User.ImageLinks.Count - (AmountImagesByPage * ImagePage) == 0)
+        {
+            Left();
+        }
+
         grid?.Update();
     }
 
     private bool IsCanLeft() => ImagePage > 0;
-    private bool IsCanRight() => User.ImageLinks.Count - (AmountImagesByPage * (ImagePage + 1)) > 0;
+    private bool IsCanRight() => User is not null ? User.ImageLinks.Count - (AmountImagesByPage * (ImagePage + 1)) > 0 : false;
 
     private void Left()
     {
@@ -103,6 +123,8 @@ else
     protected override async Task OnInitializedAsync()
     {
         var context = await ContextProvider.GetAuthenticationStateAsync();
-        User = users.Get(context.User.Identity.Name);
+        var users = uow.GetRepository<ApplicationUser>();
+        var name = context.User.Identity?.Name;
+        User = (await users.FindAsync(u => u.UserName == name)).FirstOrDefault();
     }
 }
