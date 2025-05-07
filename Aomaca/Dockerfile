@@ -1,17 +1,13 @@
-# Используем официальный образ Python как базовый
-FROM python:3.9-slim
+FROM python:3.9-slim as builder
 
-# Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
+COPY requirements.txt .
+RUN pip install --user -r requirements.txt
 
-# Копируем файл с зависимостями
+FROM python:3.9-slim
+WORKDIR /app
+COPY --from=builder /root/.local /root/.local
 COPY . .
 
-# Устанавливаем зависимости
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Указываем порт, который будет использовать приложение
-EXPOSE 80
-
-# Команда для запуска приложения
+ENV PATH=/root/.local/bin:$PATH
 CMD ["python", "app.py"]

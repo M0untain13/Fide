@@ -1,25 +1,21 @@
-from minio import Minio
-from minio.error import S3Error
 import os
+import boto3
 
 host = os.getenv('MINIO_HOST')
 access_key = os.getenv('MINIO_ROOT_USER')
 secret_key = os.getenv('MINIO_ROOT_PASSWORD')
 
-client = Minio(
+# Использование ресурса вместо клиента
+s3_resource = boto3.resource(
     host,
-    access_key=access_key,
-    secret_key=secret_key
+    aws_access_key_id=access_key,
+    aws_secret_access_key=secret_key,
 )
 
 def upload_image(bucket_name: str, object_name: str, file_path: str) -> None:
-    try:
-        client.fput_object(bucket_name, object_name, file_path)
-    except S3Error as err:
-        print(err)
+    bucket = s3_resource.Bucket(bucket_name)
+    bucket.upload_file(file_path, object_name)
 
 def get_image(bucket_name: str, object_name: str, file_path: str) -> None:
-    try:
-        client.fget_object(bucket_name, object_name, file_path)
-    except S3Error as err:
-        print(err)
+    bucket = s3_resource.Bucket(bucket_name)
+    bucket.download_file(object_name, file_path)
