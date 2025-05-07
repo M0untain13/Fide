@@ -35,14 +35,6 @@ public class Program
         {
             Console.WriteLine("Try connect to database...");
             Thread.Sleep(timeout);
-            try
-            {
-                context.Database.EnsureCreated();
-            }
-            catch
-            {
-                // Так надо :)
-            }
         }
         Console.WriteLine("Database is connected");
         app.Run();

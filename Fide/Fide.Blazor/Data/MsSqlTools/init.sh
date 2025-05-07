@@ -13,12 +13,12 @@ while ! /opt/mssql-tools/bin/sqlcmd -S $DATABASE_HOST -U SA -P "$MSSQL_SA_PASSWO
 done
 
 /opt/mssql-tools/bin/sqlcmd -S $DATABASE_HOST -U SA -P "$MSSQL_SA_PASSWORD" \
-  -Q "IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = '$DATABASE_NAME') CREATE DATABASE $DATABASE_NAME;" &> /dev/null; do
+  -Q "IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = '$DATABASE_NAME') CREATE DATABASE -d;" &> /dev/null;
 
 echo "Executing SQL scripts..."
 for file in scripts/*.sql; do
   echo "Executing $file"
-  /opt/mssql-tools/bin/sqlcmd -S $DATABASE_HOST -U SA -P "$MSSQL_SA_PASSWORD" -i "$file" -b -r
+  /opt/mssql-tools/bin/sqlcmd -S $DATABASE_HOST -d $DATABASE_NAME -U SA -P "$MSSQL_SA_PASSWORD" -i "$file" -b -r
   if [ $? -ne 0 ]; then
     exit 1
   fi

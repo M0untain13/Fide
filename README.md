@@ -8,6 +8,7 @@ FIDE_HOST=fide
 
 # БД
 DATABASE_HOST=mssql
+DATABASE_NAME=FideDB
 MSSQL_SA_PASSWORD=yourpassword
 ACCEPT_EULA=Y
 

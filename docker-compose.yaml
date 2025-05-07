@@ -16,7 +16,7 @@ services:
     networks:
       - local_net
     volumes:
-      - database_volume10:/var/opt/mssql
+      - database_volume12:/var/opt/mssql
     ports:
       - 7001:1433
   database-init:
@@ -51,4 +51,4 @@ networks:
 
 volumes:
   minio_volume: {}
-  database_volume10: {}
+  database_volume12: {}
