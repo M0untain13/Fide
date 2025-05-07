@@ -14,6 +14,15 @@
 
 <PageTitle>Мои изображения</PageTitle>
 
+@if (IsCanLeft() || IsCanRight())
+{
+    <button @onclick="Left" disabled="@(!IsCanLeft())">left</button>
+    <button @onclick="Right" disabled="@(!IsCanRight())">right</button>
+    <div>Страница @(ImagePage + 1)</div>
+}
+
+<InputFile OnChange="UploadImages" multiple accept=".jpg" />
+
 @if (User is null)
 {
     <p>Загрузка...</p>
@@ -27,17 +36,10 @@ else
     else
     {
         <Grid Source="RenderImages" @ref="grid">
-            <Image ImageLink="context" />
+            <Image ImageLink="context" OnDelete="DeleteImage" />
         </Grid>
     }
 }
-
-<InputFile OnChange="UploadImages" multiple />
-
-<button @onclick="Left">left</button>
-<button @onclick="Right">right</button>
-<div>Страница @(ImagePage+1)</div>
-<div>@(User.ImageLinks.Count - (AmountImagesByPage * (ImagePage + 1)))</div>
 
 @code {
     private Grid<ImageLink>? grid;
@@ -50,7 +52,7 @@ else
 
     private int AmountImagesByPage { get; set; } = 12;
 
-    private async void UploadImages(InputFileChangeEventArgs e)
+    private async Task UploadImages(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles();
 
@@ -58,18 +60,33 @@ else
 
         foreach(var file in files)
         {
-            var image = await ImageManager.UploadImageAsync(file.OpenReadStream(), file.Name);
-            User.ImageLinks.Add(image);
-            users.Update(User);
-            users.Save();
+            if (file.ContentType == "image/jpeg")
+            {
+                var image = await ImageManager.UploadImageAsync(file.OpenReadStream(), file.Name);
+                User.ImageLinks.Add(image);
+                users.Update(User);
+                users.Save();
+            }
         }
 
         grid?.Update();
     }
 
+    private async Task DeleteImage(ImageLink imageLink)
+    {
+        User.ImageLinks.Remove(imageLink);
+        users.Update(User);
+        users.Save();
+        await ImageManager.DeleteImageAsync(imageLink);
+        grid?.Update();
+    }
+
+    private bool IsCanLeft() => ImagePage > 0;
+    private bool IsCanRight() => User.ImageLinks.Count - (AmountImagesByPage * (ImagePage + 1)) > 0;
+
     private void Left()
     {
-        if (ImagePage > 0)
+        if (IsCanLeft())
         {
             ImagePage--;
         }
@@ -77,7 +94,7 @@ else
 
     private void Right()
     {
-        if (User.ImageLinks.Count - (AmountImagesByPage * (ImagePage + 1)) > 0)
+        if (IsCanRight())
         {
             ImagePage++;
         }

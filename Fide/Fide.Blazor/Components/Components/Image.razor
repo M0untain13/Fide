@@ -14,18 +14,12 @@
         </div>
 
         <div class="button-group">
-            @if (OnDelete is not null)
-            {
-                <button @onclick="DeleteImage" class="action-button delete-button">
-                    Удалить
-                </button>
-            }
-            @if (OnAnalyze is not null)
-            {
-                <button @onclick="AnalyzeImage" class="action-button analyze-button">
-                    Анализ
-                </button>
-            }
+            <button @onclick="DeleteImage" class="action-button delete-button">
+                Удалить
+            </button>
+            <button @onclick="AnalyzeImage" class="action-button analyze-button">
+                Анализ
+            </button>
         </div>
     }
     else
@@ -39,26 +33,20 @@
     public required ImageLink ImageLink { get; set; }
 
     [Parameter]
-    public EventCallback<ImageLink>? OnDelete { get; set; }
+    public EventCallback<ImageLink> OnDelete { get; set; }
 
     [Parameter]
-    public EventCallback<ImageLink>? OnAnalyze { get; set; }
+    public EventCallback<ImageLink> OnAnalyze { get; set; }
 
     private bool _hasTwoImages => false;
 
     private async Task DeleteImage()
     {
-        if (OnDelete is EventCallback<ImageLink> callback)
-        {
-            await callback.InvokeAsync(ImageLink);
-        }
+        await OnDelete.InvokeAsync(ImageLink);
     }
 
     private async Task AnalyzeImage()
     {
-        if (OnAnalyze is EventCallback<ImageLink> callback)
-        {
-            await callback.InvokeAsync(ImageLink);
-        }
+        await OnAnalyze.InvokeAsync(ImageLink);
     }
 }
