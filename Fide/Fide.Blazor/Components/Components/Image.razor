@@ -37,6 +37,8 @@
     private string? PresignedOriginalUrl { get; set; }
     private string? PresignedAnalysisUrl { get; set; }
 
+    private Guid LastGuid { get; set; }
+
     [Parameter]
     public required ImageLink ImageLink { get; set; }
 
@@ -57,14 +59,25 @@
         PresignedAnalysisUrl = await storage.GeneratePresignedUrl(ImageLink.AnalysisName, new TimeSpan(1, 0, 0));
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        if (LastGuid != ImageLink.Id)
+        {
+            PresignedOriginalUrl = null;
+            PresignedAnalysisUrl = null;
+        }
+        LastGuid = ImageLink.Id;
+
         PresignedOriginalUrl = await storage.GeneratePresignedUrl(ImageLink.OriginalName, new TimeSpan(1, 0, 0));
 
         var analysisName = ImageLink.AnalysisName;
-        if(analysisName is not null)
+        if (analysisName is not null)
         {
             PresignedAnalysisUrl = await storage.GeneratePresignedUrl(analysisName, new TimeSpan(1, 0, 0));
+        }
+        else
+        {
+            PresignedAnalysisUrl = null;
         }
     }
 }

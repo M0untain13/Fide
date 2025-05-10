@@ -15,6 +15,9 @@ using Microsoft.Extensions.Options;
 
 namespace Fide.Blazor;
 
+// TODO: много где надо исправить хардкод
+// TODO: добавить в модель поле дату загрузки изображения и результат анализа
+
 public class Program
 {
     public static void Main(string[] args)

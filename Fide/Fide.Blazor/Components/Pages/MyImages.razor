@@ -37,16 +37,18 @@ else
     }
     else
     {
-        <Grid Source="RenderImages" @ref="grid">
-            <Image ImageLink="context" OnDelete="DeleteImage" OnAnalyze="AnalisysImage" />
+        <Grid Source="RenderImages">
+            <Image 
+                ImageLink="context" 
+                OnDelete="DeleteImage" 
+                OnAnalyze="AnalisysImage" 
+                />
         </Grid>
     }
 }
 
 @code {
-    private Grid<ImageLink>? grid;
-
-    private IEnumerable<ImageLink> RenderImages => User.ImageLinks.Skip(AmountImagesByPage * ImagePage).Take(AmountImagesByPage);
+    private IEnumerable<ImageLink> RenderImages => User.ImageLinks.OrderBy(i => i.Id).Skip(AmountImagesByPage * ImagePage).Take(AmountImagesByPage);
 
     private ApplicationUser? User { get; set; }
 
@@ -62,11 +64,13 @@ else
 
         var users = uow.GetRepository<ApplicationUser>();
         var images = uow.GetRepository<ImageLink>();
+        var maxbytes = 5120000;
         foreach(var file in files)
         {
-            if (file.ContentType == "image/jpeg")
+            if (file.ContentType == "image/jpeg"
+                && file.Size <= maxbytes)
             {
-                var nameInBucket = await storage.UploadFileAsync(file.OpenReadStream(), file.Name);
+                var nameInBucket = await storage.UploadFileAsync(file.OpenReadStream(maxbytes), file.Name);
                 var image = new ImageLink()
                 {
                     OriginalName = nameInBucket,
@@ -77,8 +81,6 @@ else
             }
         }
         await uow.CommitAsync();
-
-        grid?.Update();
     }
 
     private async Task DeleteImage(ImageLink imageLink)
@@ -102,8 +104,6 @@ else
         {
             Left();
         }
-
-        grid?.Update();
     }
 
     private async Task AnalisysImage(ImageLink imageLink)

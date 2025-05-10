@@ -1,9 +1,9 @@
 ﻿@typeparam TItem
 
-<div class="grid-container grid-columns-@Columns">
+<div class="grid-container">
     @foreach (var item in Source)
     {
-        <div class="grid-item-content">
+        <div class="grid-item">
             @ChildContent(item)
         </div>
     }
@@ -15,12 +15,4 @@
 
     [Parameter]
     public required IEnumerable<TItem> Source { get; set; }
-
-    [Parameter]
-    public int Columns { get; set; } = 3;
-
-    public void Update()
-    {
-        StateHasChanged();
-    }
 }
