@@ -1,12 +1,10 @@
 ﻿@page "/myimages"
 
 @using Microsoft.AspNetCore.Authorization;
-@using System.Collections.Generic;
 @using Fide.Blazor.Data;
 @using Fide.Blazor.Services.FileStorage
 @using Fide.Blazor.Services.AnalysisProxy
 @using Fide.Blazor.Services.Data.UnitOfWork
-@using Fide.Blazor.Services.Repositories.Base
 @using Fide.Blazor.Components.Components
 @using DTO.Analysis
 
@@ -92,6 +90,10 @@ else
         users.Update(User);
 
         await storage.DeleteFileAsync(imageLink.OriginalName);
+        if (imageLink.AnalysisName is not null)
+        {
+            await storage.DeleteFileAsync(imageLink.AnalysisName);
+        }
         images.Remove(imageLink);
 
         await uow.CommitAsync();

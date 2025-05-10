@@ -2,7 +2,7 @@
 
 public class AnalysisResponse
 {
-    public double PredictedResult { get; set; }
+    public double? PredictedResult { get; set; }
     public required string BucketName { get; set; }
     public required string ObjectName { get; set; }
 }

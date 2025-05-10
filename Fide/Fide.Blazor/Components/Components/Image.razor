@@ -4,26 +4,27 @@
 
 @inject IFileStorage storage
 
-<div class="image-frame @(_hasTwoImages ? "double-image" : "")">
-    @if (url != null)
+<div class="image-frame">
+    @if (PresignedOriginalUrl is not null)
     {
         <div class="image-container">
-            <img src="@url" alt="Main image" class="displayed-image" />
-            @*
-            @if (ImageData.SecondImageUrl != null)
+            <img src="@PresignedOriginalUrl" alt="Main image" class="displayed-image" />
+            @if (PresignedAnalysisUrl is not null)
             {
-                <img src="@ImageData.SecondImageUrl" alt="Secondary image" class="displayed-image" />
+                <img src="@PresignedAnalysisUrl" alt="Second image" class="displayed-image" />
             }
-            *@
         </div>
 
         <div class="button-group">
             <button @onclick="DeleteImage" class="action-button delete-button">
                 Удалить
             </button>
-            <button @onclick="AnalyzeImage" class="action-button analyze-button">
-                Анализ
-            </button>
+            @if(PresignedAnalysisUrl is null)
+            {
+                <button @onclick="AnalyzeImage" class="action-button analyze-button">
+                    Анализ
+                </button>
+            }
         </div>
     }
     else
@@ -33,7 +34,8 @@
 </div>
 
 @code {
-    private string? url { get; set; }
+    private string? PresignedOriginalUrl { get; set; }
+    private string? PresignedAnalysisUrl { get; set; }
 
     [Parameter]
     public required ImageLink ImageLink { get; set; }
@@ -44,8 +46,6 @@
     [Parameter]
     public EventCallback<ImageLink> OnAnalyze { get; set; }
 
-    private bool _hasTwoImages => false;
-
     private async Task DeleteImage()
     {
         await OnDelete.InvokeAsync(ImageLink);
@@ -54,12 +54,17 @@
     private async Task AnalyzeImage()
     {
         await OnAnalyze.InvokeAsync(ImageLink);
+        PresignedAnalysisUrl = await storage.GeneratePresignedUrl(ImageLink.AnalysisName, new TimeSpan(1, 0, 0));
     }
 
     protected override async Task OnInitializedAsync()
     {
-        url = await storage.GeneratePresignedUrl(ImageLink.OriginalName, new TimeSpan(1, 0, 0));
-        // TODO: костыль, который потом убрать!
-        url = url.Replace("https", "http");
+        PresignedOriginalUrl = await storage.GeneratePresignedUrl(ImageLink.OriginalName, new TimeSpan(1, 0, 0));
+
+        var analysisName = ImageLink.AnalysisName;
+        if(analysisName is not null)
+        {
+            PresignedAnalysisUrl = await storage.GeneratePresignedUrl(analysisName, new TimeSpan(1, 0, 0));
+        }
     }
 }

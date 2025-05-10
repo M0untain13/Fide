@@ -37,13 +37,6 @@ public class S3Service(IAmazonS3 s3Client, IOptions<S3Options> options) : IFileS
         await _s3Client.DeleteObjectAsync(_options.BucketName, fileName);
     }
 
-    /*
-    public string GetFileUrl(string fileName)
-    {
-        return $"{_options.ServiceURL}/{_options.BucketName}/{fileName}";
-    }
-    */
-
     public async Task<string> GeneratePresignedUrl(string fileName, TimeSpan expiry)
     {
         var request = new GetPreSignedUrlRequest
@@ -53,6 +46,10 @@ public class S3Service(IAmazonS3 s3Client, IOptions<S3Options> options) : IFileS
             Expires = DateTime.UtcNow.Add(expiry)
         };
 
-        return await Task.FromResult(_s3Client.GetPreSignedURL(request));
+        return await Task.Run(() =>
+        {
+            var url = _s3Client.GetPreSignedURL(request);
+            return url.Replace("https", "http");
+        });
     }
 }
