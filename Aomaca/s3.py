@@ -10,7 +10,7 @@ secret_key = os.getenv('MINIO_ROOT_PASSWORD')
 def __get_storage() -> S3Storage.S3Storage:
     return S3Storage.S3Storage(
         # TODO: исправить захардкоженный порт
-        endpoint_url=host+":9000",
+        endpoint_url="http://"+host+":9000",
         aws_access_key_id=access_key,
         aws_secret_access_key=secret_key,
     )

@@ -33,5 +33,5 @@ def get_enhance(image: Image, format: str) -> Image:
 
 def get_ela(image_for_analysis_path: str, image_ela_path: str) -> None:
     image = get_difference(image_for_analysis_path, 90, 'RGB')
-    image = get_enhance(image, format)
+    image = get_enhance(image, 'RGB')
     image.save(image_ela_path)
