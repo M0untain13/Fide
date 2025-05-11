@@ -16,14 +16,15 @@
 
 <PageTitle>Мои изображения</PageTitle>
 
-@if (IsCanLeft() || IsCanRight())
+@if (CanSetPageNumber(1))
 {
-    <button @onclick="Left" disabled="@(!IsCanLeft())">@("<")</button>
-    @(ImagePage + 1)
-    <button @onclick="Right" disabled="@(!IsCanRight())">></button>
+    <div>
+        Страница:
+        <InputNumber @bind-Value="VisibleImagePage"/>
+    </div>
 }
 
-<InputFile OnChange="UploadImages" multiple accept=".jpg" class="inputfile-text" />
+<InputFile OnChange="UploadImages" multiple accept=".jpg" />
 
 @if (User is null)
 {
@@ -53,6 +54,18 @@ else
     private ApplicationUser? User { get; set; }
 
     private int ImagePage { get; set; } = 0;
+
+    public int VisibleImagePage 
+    {
+        get => ImagePage + 1;
+        set {
+            var newValue = value - 1;
+            if (CanSetPageNumber(newValue))
+            {
+                ImagePage = newValue;
+            }
+        }
+    }
 
     private int AmountImagesByPage { get; set; } = 12;
 
@@ -100,9 +113,9 @@ else
 
         await uow.CommitAsync();
 
-        if(IsCanLeft() && User.ImageLinks.Count - (AmountImagesByPage * ImagePage) == 0)
+        if (!CanSetPageNumber(ImagePage))
         {
-            Left();
+            ImagePage--;
         }
     }
 
@@ -127,23 +140,9 @@ else
         }
     }
 
-    private bool IsCanLeft() => ImagePage > 0;
-    private bool IsCanRight() => User is not null ? User.ImageLinks.Count - (AmountImagesByPage * (ImagePage + 1)) > 0 : false;
-
-    private void Left()
+    private bool CanSetPageNumber(int number)
     {
-        if (IsCanLeft())
-        {
-            ImagePage--;
-        }
-    }
-
-    private void Right()
-    {
-        if (IsCanRight())
-        {
-            ImagePage++;
-        }
+        return User is not null && number >= 0 && User.ImageLinks.Count - (AmountImagesByPage * number) > 0;
     }
 
     protected override async Task OnInitializedAsync()

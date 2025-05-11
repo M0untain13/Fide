@@ -6,11 +6,7 @@
     display: inline-block;
     background-color: #f8f9fa;
     transition: height 0.3s ease;
-}
-
-.image-frame.double-image {
-    /* Adjust as needed for two images */
-    min-height: 300px;
+    position: relative;
 }
 
 .image-container {
@@ -44,6 +40,9 @@
 .delete-button {
     background-color: #dc3545;
     color: white;
+    position: absolute;
+    right: 0;
+    top: 0;
 }
 
 .delete-button:hover {

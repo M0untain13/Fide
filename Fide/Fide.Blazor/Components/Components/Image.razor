@@ -7,6 +7,9 @@
 <div class="image-frame">
     @if (PresignedOriginalUrl is not null)
     {
+        <button @onclick="DeleteImage" class="action-button delete-button">
+            х
+        </button>
         <div class="image-container">
             <img src="@PresignedOriginalUrl" alt="Main image" class="displayed-image" />
             @if (PresignedAnalysisUrl is not null)
@@ -20,18 +23,12 @@
                 </div>
             }
         </div>
-
-        <div class="button-group">
-            <button @onclick="DeleteImage" class="action-button delete-button">
-                Удалить
+        @if (PresignedAnalysisUrl is null)
+        {
+            <button @onclick="AnalyzeImage" class="action-button analyze-button">
+                Анализ
             </button>
-            @if(PresignedAnalysisUrl is null)
-            {
-                <button @onclick="AnalyzeImage" class="action-button analyze-button">
-                    Анализ
-                </button>
-            }
-        </div>
+        }
     }
     else
     {
