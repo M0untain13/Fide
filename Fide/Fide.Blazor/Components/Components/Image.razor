@@ -13,6 +13,12 @@
             {
                 <img src="@PresignedAnalysisUrl" alt="Second image" class="displayed-image" />
             }
+            @if (ImageLink.AnalysisResult is not null)
+            {
+                <div>
+                    Вероятность подделки @(((double)ImageLink.AnalysisResult*100).ToString("F0"))%
+                </div>
+            }
         </div>
 
         <div class="button-group">

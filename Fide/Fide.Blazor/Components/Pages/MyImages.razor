@@ -39,16 +39,16 @@ else
     {
         <Grid Source="RenderImages">
             <Image 
-                ImageLink="context" 
-                OnDelete="DeleteImage" 
-                OnAnalyze="AnalisysImage" 
-                />
+            ImageLink="context" 
+            OnDelete="DeleteImage" 
+            OnAnalyze="AnalisysImage" 
+            />
         </Grid>
     }
 }
 
 @code {
-    private IEnumerable<ImageLink> RenderImages => User.ImageLinks.OrderBy(i => i.Id).Skip(AmountImagesByPage * ImagePage).Take(AmountImagesByPage);
+    private IEnumerable<ImageLink> RenderImages => User.ImageLinks.OrderBy(i => i.Created).Skip(AmountImagesByPage * ImagePage).Take(AmountImagesByPage);
 
     private ApplicationUser? User { get; set; }
 
@@ -118,6 +118,8 @@ else
             };
             var response = await analysisClient.SendAsync(request);
             imageLink.AnalysisName = response.ObjectName;
+            imageLink.AnalysisResult = response.PredictedResult;
+            imageLink.AnalysisRequested = DateTime.UtcNow;
 
             var images = uow.GetRepository<ImageLink>();
             images.Update(imageLink);
