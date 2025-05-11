@@ -36,7 +36,7 @@ def analysis():
     upload_image(image_ela_bucket, object_name_ela, image_ela_path)
 
     response = {
-        "PredictedResult": predict_result(image_for_analysis_path), 
+        "PredictedResult": float(predict_result(image_for_analysis_path)), 
         "BucketName": image_ela_bucket,
         "ObjectName": object_name_ela
     }
