@@ -11,6 +11,23 @@ public class UnitOfWork(DbContext context) : IUnitOfWork
     public async Task<int> CommitAsync()
         => await context.SaveChangesAsync();
 
+    public void Rollback()
+    {
+        foreach (var entry in context.ChangeTracker.Entries())
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.State = EntityState.Detached;
+                    break;
+                case EntityState.Modified:
+                case EntityState.Deleted:
+                    entry.Reload();
+                    break;
+            }
+        }
+    }
+
     #region IDisposable Implementation
     private bool _isDisposed;
 

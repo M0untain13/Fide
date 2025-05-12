@@ -16,6 +16,15 @@
 
 <PageTitle>Мои изображения</PageTitle>
 
+@if(ErrorMessage is not null){
+    <div>
+        @ErrorMessage
+        <button @onclick="() => ErrorMessage = null">
+            х
+        </button>
+    </div>
+}
+
 @if (CanSetPageNumber(1))
 {
     <div>
@@ -49,6 +58,10 @@ else
 }
 
 @code {
+    private string? ErrorMessage { get; set; }
+}
+
+@code {
     private IEnumerable<ImageLink> RenderImages => User.ImageLinks.OrderBy(i => i.Created).Skip(AmountImagesByPage * ImagePage).Take(AmountImagesByPage);
 
     private ApplicationUser? User { get; set; }
@@ -71,47 +84,69 @@ else
 
     private async Task UploadImages(InputFileChangeEventArgs e)
     {
-        var files = e.GetMultipleFiles();
-
-        var fileStreams = new List<Stream>();
-
-        var users = uow.GetRepository<ApplicationUser>();
-        var images = uow.GetRepository<ImageLink>();
-        var maxbytes = 5120000;
-        foreach(var file in files)
+        if (User is not null)
         {
-            if (file.ContentType == "image/jpeg"
-                && file.Size <= maxbytes)
+            try
             {
-                var nameInBucket = await storage.UploadFileAsync(file.OpenReadStream(maxbytes), file.Name);
-                var image = new ImageLink()
+                var files = e.GetMultipleFiles();
+
+                var fileStreams = new List<Stream>();
+
+                var users = uow.GetRepository<ApplicationUser>();
+                var images = uow.GetRepository<ImageLink>();
+                var maxbytes = 5120000;
+
+                foreach (var file in files)
                 {
-                    OriginalName = nameInBucket,
-                };
-                await images.AddAsync(image);
-                User.ImageLinks.Add(image);
-                users.Update(User);
+                    if (file.ContentType == "image/jpeg"
+                        && file.Size <= maxbytes)
+                    {
+                        var nameInBucket = await storage.UploadFileAsync(file.OpenReadStream(maxbytes), file.Name);
+                        var image = new ImageLink()
+                            {
+                                OriginalName = nameInBucket,
+                            };
+                        await images.AddAsync(image);
+                        User.ImageLinks.Add(image);
+                        users.Update(User);
+                    }
+                }
+                await uow.CommitAsync();
+            }
+            catch
+            {
+                uow.Rollback();
             }
         }
-        await uow.CommitAsync();
     }
 
     private async Task DeleteImage(ImageLink imageLink)
     {
-        var users = uow.GetRepository<ApplicationUser>();
-        var images = uow.GetRepository<ImageLink>();
-
-        User.ImageLinks.Remove(imageLink);
-        users.Update(User);
-
-        await storage.DeleteFileAsync(imageLink.OriginalName);
-        if (imageLink.AnalysisName is not null)
+        try
         {
-            await storage.DeleteFileAsync(imageLink.AnalysisName);
-        }
-        images.Remove(imageLink);
+            var users = uow.GetRepository<ApplicationUser>();
+            var images = uow.GetRepository<ImageLink>();
 
-        await uow.CommitAsync();
+            var user = imageLink.User;
+            if (user is not null)
+            {
+                user.ImageLinks.Remove(imageLink);
+                users.Update(user);
+            }
+
+            await storage.DeleteFileAsync(imageLink.OriginalName);
+            if (imageLink.AnalysisName is not null)
+            {
+                await storage.DeleteFileAsync(imageLink.AnalysisName);
+            }
+            images.Remove(imageLink);
+
+            await uow.CommitAsync();
+        }
+        catch
+        {
+            uow.Rollback();
+        }
 
         if (!CanSetPageNumber(ImagePage))
         {
@@ -123,20 +158,27 @@ else
     {
         if(imageLink.AnalysisName is null)
         {
-            var request = new AnalysisRequest()
+            try
             {
-                // TODO: исправить захардкоженный бакет
-                BucketName = "filesbucket",
-                ObjectName = imageLink.OriginalName
-            };
-            var response = await analysisClient.SendAsync(request);
-            imageLink.AnalysisName = response.ObjectName;
-            imageLink.AnalysisResult = response.PredictedResult;
-            imageLink.AnalysisRequested = DateTime.UtcNow;
+                var request = new AnalysisRequest()
+                {
+                    // TODO: исправить захардкоженный бакет
+                    BucketName = "filesbucket",
+                    ObjectName = imageLink.OriginalName
+                };
+                var response = await analysisClient.SendAsync(request);
+                imageLink.AnalysisName = response.ObjectName;
+                imageLink.AnalysisResult = response.PredictedResult;
+                imageLink.AnalysisRequested = DateTime.UtcNow;
 
-            var images = uow.GetRepository<ImageLink>();
-            images.Update(imageLink);
-            await uow.CommitAsync();
+                var images = uow.GetRepository<ImageLink>();
+                images.Update(imageLink);
+                await uow.CommitAsync();
+            }
+            catch
+            {
+                uow.Rollback();
+            }
         }
     }
 
