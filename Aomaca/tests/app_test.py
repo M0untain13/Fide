@@ -1,6 +1,5 @@
 import unittest
-from unittest.mock import patch, MagicMock
-import io
+from unittest.mock import patch
 import os
 import src.app as app  # Импортируем Flask-приложение
 
