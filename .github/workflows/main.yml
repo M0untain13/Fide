@@ -46,7 +46,7 @@ jobs:
       - name: Generate test report
         if: always()
         run: |
-          python -m xmlrunner discover -s tests -p "test_*.py" -o test-results
+          python -m unittest discover -s tests -p "test_*.py" -v
           
       - name: Upload test results
         if: always()
