@@ -21,4 +21,4 @@ jobs:
         run: pip install pyflakes
 
       - name: Run Pyflakes
-        run: pyflakes /Aomaca
+        run: pyflakes Aomaca/
