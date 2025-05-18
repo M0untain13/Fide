@@ -3,7 +3,9 @@ from unittest.mock import patch, MagicMock
 import numpy as np
 from PIL import Image
 import sys
-sys.path.append("../src")
+from pathlib import Path
+project_root = Path(__file__).parent.parent 
+sys.path.append(str(project_root))
 import cnn
 
 class TestCNN(unittest.TestCase):
