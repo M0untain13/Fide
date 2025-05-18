@@ -1,8 +1,6 @@
 import os
 import logging
-from typing import Optional, BinaryIO, Union
 from boto3 import Session
-from botocore.client import BaseClient
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger(__name__)
