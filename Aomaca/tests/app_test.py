@@ -1,7 +1,8 @@
 import unittest
 from unittest.mock import patch
 import os, sys
-from ..src import app  # Импортируем Flask-приложение
+sys.path.append("../src")
+import app  # Импортируем Flask-приложение
 
 class TestApp(unittest.TestCase):
     def setUp(self):
