@@ -10,4 +10,4 @@ COPY --from=builder /root/.local /root/.local
 COPY . .
 
 ENV PATH=/root/.local/bin:$PATH
-CMD ["python", "app.py"]
+CMD ["python", "src/app.py"]
