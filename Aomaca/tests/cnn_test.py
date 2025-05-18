@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 import numpy as np
 from PIL import Image
-import src.cnn as cnn
+from ..src import cnn
 
 class TestCNN(unittest.TestCase):
     @patch('keras.models.load_model')  # Мокируем загрузку модели

@@ -1,7 +1,7 @@
 import unittest
 import os
 from PIL import Image
-import src.ela as ela
+from ..src import ela
 
 class TestELA(unittest.TestCase):
     def setUp(self):
