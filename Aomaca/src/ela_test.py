@@ -1,9 +1,6 @@
 import unittest
-import os, sys
+import os
 from PIL import Image
-from pathlib import Path
-project_root = Path(__file__).parent.parent 
-sys.path.append(str(project_root))
 import ela
 
 class TestELA(unittest.TestCase):

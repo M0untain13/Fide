@@ -1,10 +1,7 @@
 import unittest
 from unittest.mock import patch
-import os, sys
-from pathlib import Path
-project_root = Path(__file__).parent.parent 
-sys.path.append(str(project_root))
-import app  # Импортируем Flask-приложение
+import os
+import app
 
 class TestApp(unittest.TestCase):
     def setUp(self):
