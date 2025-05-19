@@ -3,8 +3,12 @@ name: Fide Jobs
 on:
   push:
     branches: [ master ]
+    paths:
+    - Fide/**
   pull_request:
     branches: [ master ]
+    paths:
+    - Fide/**
 
 jobs:
   test:
@@ -20,10 +24,13 @@ jobs:
         dotnet-version: '8.0.x'
     
     - name: Restore dependencies
+      working-directory: ./Fide
       run: dotnet restore
     
     - name: Build
+      working-directory: ./Fide
       run: dotnet build --configuration Release --no-restore
     
     - name: Run tests
+      working-directory: ./Fide
       run: dotnet test --configuration Release --no-build --verbosity normal

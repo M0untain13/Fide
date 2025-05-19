@@ -3,8 +3,12 @@ name: Aomaca Jobs
 on:
   push:
     branches: [ master ]
+    paths:
+    - Aomaca/**
   pull_request:
     branches: [ master ]
+    paths:
+    - Aomaca/**
 
 jobs:
   lint:
