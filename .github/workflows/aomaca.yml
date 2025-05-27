@@ -2,7 +2,6 @@ name: Aomaca Jobs
 
 on:
   push:
-    branches: [ master ]
     paths:
     - Aomaca/**
   pull_request:

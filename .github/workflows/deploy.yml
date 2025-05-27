@@ -1,0 +1,18 @@
+name: Deploy
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [master]
+  workflow_run:
+    workflows: ["Aomaca Jobs", "Fide Jobs"]
+    types:
+      - completed
+
+jobs:
+  delivery:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print
+        run: echo "test"
