@@ -9,10 +9,61 @@ on:
     types:
       - completed
 
+env:
+  REGISTRY: ${{ secrets.REGISTRY_HOST }}
+  REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+  REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+  VM_IP: ${{ secrets.SSH_HOST }}
+  SSH_USER: ${{ secrets.SSH_ACCESS_KEY }}
+  SSH_KEY: ${{ secrets.SSH_SECRET_KEY }}
+  DOCKER_COMPOSE_FILE: docker-compose.prod.yml # Или ваш файл docker-compose
+
 jobs:
-  delivery:
+  build-and-deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+
     steps:
-      - name: Print
-        run: echo "test"
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Логин в Artifact Registry
+    - name: Login to Artifact Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ env.REGISTRY_USERNAME }}
+        password: ${{ env.REGISTRY_PASSWORD }}
+
+    # Сборка и публикация Blazor образа
+    - name: Build and Push Blazor Image
+      run: |
+        docker build -t ${{ env.REGISTRY }}/fide:latest -f Fide/Dockerfile .
+        docker push ${{ env.REGISTRY }}/fide:latest
+
+    # Сборка и публикация Flask образа
+    - name: Build and Push Flask Image
+      run: |
+        docker build -t ${{ env.REGISTRY }}/aomaca:latest -f Aomaca/Dockerfile .
+        docker push ${{ env.REGISTRY }}/aomaca:latest
+
+    # Развертывание на виртуальной машине
+    - name: Deploy to VM
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ env.VM_IP }}
+        username: ${{ env.SSH_USER }}
+        key: ${{ env.SSH_KEY }}
+        script: |
+          # Логинимся в Artifact Registry
+          echo ${{ env.REGISTRY_PASSWORD }} | docker login ${{ env.REGISTRY }} \
+            -u ${{ env.REGISTRY_USERNAME }} --password-stdin
+          
+          # Останавливаем текущие контейнеры
+          docker-compose -f ${{ env.DOCKER_COMPOSE_FILE }} down || true
+          
+          # Подтягиваем новые образы
+          docker-compose -f ${{ env.DOCKER_COMPOSE_FILE }} pull
+          
+          # Запускаем контейнеры
+          docker-compose -f ${{ env.DOCKER_COMPOSE_FILE }} up -d
