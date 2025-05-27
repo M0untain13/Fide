@@ -2,7 +2,6 @@ name: Fide Jobs
 
 on:
   push:
-    branches: [ master ]
     paths:
     - Fide/**
   pull_request:
