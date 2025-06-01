@@ -38,13 +38,13 @@ jobs:
     # Сборка и публикация Blazor образа
     - name: Build and Push Blazor Image
       run: |
-        docker build -t ${{ env.REGISTRY }}/fide:latest -f Fide/Dockerfile .
+        docker build -t ${{ env.REGISTRY }}/fide:latest -f Fide/Dockerfile Fide/
         docker push ${{ env.REGISTRY }}/fide:latest
 
     # Сборка и публикация Flask образа
     - name: Build and Push Flask Image
       run: |
-        docker build -t ${{ env.REGISTRY }}/aomaca:latest -f Aomaca/Dockerfile .
+        docker build -t ${{ env.REGISTRY }}/aomaca:latest -f Aomaca/Dockerfile Aomaca/
         docker push ${{ env.REGISTRY }}/aomaca:latest
 
     # Развертывание на виртуальной машине
