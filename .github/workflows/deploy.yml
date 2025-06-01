@@ -54,11 +54,13 @@ jobs:
         host: ${{ env.VM_IP }}
         username: ${{ env.SSH_USER }}
         key: ${{ env.SSH_KEY }}
+        source: "docker-compose.prod.yml"
+        target: "docker-compose.prod.yml"
         script: |
           # Логинимся в Artifact Registry
           echo ${{ env.REGISTRY_PASSWORD }} | docker login ${{ env.REGISTRY }} \
             -u ${{ env.REGISTRY_USERNAME }} --password-stdin
-          
+
           # Останавливаем текущие контейнеры
           docker-compose -f ${{ env.DOCKER_COMPOSE_FILE }} down || true
           
