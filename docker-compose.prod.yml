@@ -1,0 +1,52 @@
+services:
+  fide:
+    container_name: ${FIDE_HOST}
+    build: ./Fide
+    env_file: "./.env"
+    networks:
+    - local_net
+    ports:
+    - "8080:8080"
+  database:
+    container_name: ${DATABASE_HOST}
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    env_file: .env
+    networks:
+      - local_net
+    volumes:
+      - database_volume:/var/opt/mssql
+    ports:
+      - 7001:1433
+  database-init:
+    container_name: migrate_database
+    build: ./Fide/Fide.Blazor/Data/MsSqlTools
+    env_file: "./.env"
+    networks:
+    - local_net
+  aomaca:
+    container_name: ${AOMACA_HOST}
+    build: ./Aomaca
+    env_file: "./.env"
+    networks:
+    - local_net
+    ports:
+    - "8081:80"
+  minio:
+    container_name: ${MINIO_HOST}
+    image: bitnami/minio:2024.7.26
+    env_file: "./.env"
+    volumes:
+      - minio_volume:/bitnami/minio/data
+    networks:
+    - local_net
+    ports:
+    - "9000:9000"
+    - "9001:9001"
+
+networks:
+  local_net:
+    driver: bridge
+
+volumes:
+  minio_volume: {}
+  database_volume: {}

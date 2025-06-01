@@ -16,7 +16,7 @@ env:
   VM_IP: ${{ secrets.SSH_HOST }}
   SSH_USER: ${{ secrets.SSH_ACCESS_KEY }}
   SSH_KEY: ${{ secrets.SSH_SECRET_KEY }}
-  DOCKER_COMPOSE_FILE: docker-compose.prod.yml # Или ваш файл docker-compose
+  DOCKER_COMPOSE_FILE: docker-compose.prod.yml
 
 jobs:
   build-and-deploy:
