@@ -8,7 +8,6 @@ on:
     workflows: ["Aomaca Jobs", "Fide Jobs"]
     types:
       - completed
-  workflow_dispatch:
 
 env:
   REGISTRY: ${{ secrets.REGISTRY_HOST }}
