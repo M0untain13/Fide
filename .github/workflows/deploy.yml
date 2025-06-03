@@ -8,6 +8,7 @@ on:
     workflows: ["Aomaca Jobs", "Fide Jobs"]
     types:
       - completed
+  workflow_dispatch:
 
 env:
   REGISTRY: ${{ secrets.REGISTRY_HOST }}
@@ -19,7 +20,7 @@ env:
   DOCKER_COMPOSE_FILE: docker-compose.prod.yml
 
 jobs:
-  build-and-deploy:
+  build:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
@@ -47,6 +48,11 @@ jobs:
         docker build -t ${{ env.REGISTRY }}/aomaca:latest -f Aomaca/Dockerfile Aomaca/
         docker push ${{ env.REGISTRY }}/aomaca:latest
 
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
     # Развертывание на виртуальной машине
     - name: Deploy to VM
       uses: appleboy/ssh-action@v0.1.10
