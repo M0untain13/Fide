@@ -46,10 +46,16 @@ jobs:
       run: |
         docker build -t ${{ env.REGISTRY }}/aomaca:latest -f Aomaca/Dockerfile Aomaca/
         docker push ${{ env.REGISTRY }}/aomaca:latest
+      
+    - name: Build and Push MsSqlTool
+      run: |
+        docker build -t ${{ env.REGISTRY }}/mssqltools:latest -f Fide/Fide.Blazor/Data/MsSqlTools/Dockerfile Fide/Fide.Blazor/Data/MsSqlTools/
+        docker push ${{ env.REGISTRY }}/mssqltools:latest
 
   deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    needs: build
 
     steps:
     # Развертывание на виртуальной машине
